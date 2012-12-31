@@ -10,7 +10,7 @@
 	overflow: hidden;
 }
 
-#fluidbox-outer {
+#fluidbox-outer, #fluidbox-outer-ghost {
 	display: none;
 	position: absolute;
 	top: 50%;
