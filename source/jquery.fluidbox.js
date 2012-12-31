@@ -2,6 +2,7 @@
  * fluidBox - jQuery Plugin
  * version: 1.0
  * @requires jQuery v1.6 or later
+ * @requires Modernizr v2.5 or later
  *
  * Copyright (c) 2012 - 2013 Maarten de Boer - info@maartendeboer.net
  *
@@ -27,6 +28,7 @@ $(function() {
 		_isLoading: false,
 		_isOpening: true,
 		_isClosing: false,
+		_isTouch: false,
 		
 		/** Quick access variables for layout */
 		_overlay: {},
@@ -38,6 +40,8 @@ $(function() {
 		defaults: {
 			resize: true,
 			preload: true,
+			touch: true,
+			touchButtons: false,
 			templates: {
 				image: '<div id="fluidbox-outer"><div id="fluidbox-inner"></div></div>',
 				overlay: '<div id="fluidbox-overlay"></div>',
@@ -93,23 +97,25 @@ $(function() {
 			}
 			
 			// Navigation buttons
-			if(F._currentOptions.buttons.close !== false) {
-				$('#fluidbox-'+ F._currentOptions.buttons.close).append(F._currentOptions.templates.buttons.close);
-				$('#fluidbox-btn-close').click(function() {
-					F.close();
-				});				
-			}
-			if(F._currentOptions.buttons.next !== false) {
-				$('#fluidbox-'+ F._currentOptions.buttons.next).append(F._currentOptions.templates.buttons.next);
-				$('#fluidbox-btn-next').click(function() {
-					F.next();
-				});
-			}	
-			if(F._currentOptions.buttons.prev !== false) {
-				$('#fluidbox-'+ F._currentOptions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
-				$('#fluidbox-btn-prev').click(function() {
-					F.prev();
-				});
+			if(!F._isTouch || F._isTouch && F._currentOptions.touchButtons) {
+				if(F._currentOptions.buttons.close !== false) {
+					$('#fluidbox-'+ F._currentOptions.buttons.close).append(F._currentOptions.templates.buttons.close);
+					$('#fluidbox-btn-close').click(function() {
+						F.close();
+					});				
+				}
+				if(F._currentOptions.buttons.next !== false) {
+					$('#fluidbox-'+ F._currentOptions.buttons.next).append(F._currentOptions.templates.buttons.next);
+					$('#fluidbox-btn-next').click(function() {
+						F.next();
+					});
+				}	
+				if(F._currentOptions.buttons.prev !== false) {
+					$('#fluidbox-'+ F._currentOptions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
+					$('#fluidbox-btn-prev').click(function() {
+						F.prev();
+					});
+				}
 			}
 			
 			// Helper vars
@@ -123,15 +129,52 @@ $(function() {
 		_unbindEvents: function() {
 			// Unbind window events
 			$(window).unbind('keydown.fluidbox');
-			$(window).unbind('throttledresize.fluidbox');
+			$(window).unbind('resize.fluidbox');
 			
 			// Unbind overlay
 			F._overlay.unbind('click');
 			
 			// Unbind navigation buttons
-			F._currentOptions.templates.buttons.close.unbind('click');
-			F._currentOptions.templates.buttons.next.unbind('click');
-			F._currentOptions.templates.buttons.prev.unbind('click');
+			if(!F._isTouch || F._isTouch && F._currentOptions.touchButtons) {
+				$(F._currentOptions.templates.buttons.close).unbind('click');
+				$(F._currentOptions.templates.buttons.next).unbind('click');
+				$(F._currentOptions.templates.buttons.prev).unbind('click');
+			}
+		},
+		
+		/** Bind events */
+		_bindEvents: function() {
+		
+			// Key events
+			$(window).bind('keydown.fluidbox', function(e) {
+				if (!e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+					if ($.inArray(e.keyCode, F._currentOptions.keys.close) > -1) {
+						F.close();
+						e.preventDefault();
+					} else if ($.inArray(e.keyCode, F._currentOptions.keys.next) > -1) {
+						F.next();
+						e.preventDefault();
+					} else if ($.inArray(e.keyCode, F._currentOptions.keys.prev) > -1) {
+						F.prev();
+						e.preventDefault();
+					}
+				}
+			});
+
+			// Smart resize
+			if(F._currentOptions.resize) {
+				$(window).bind("resize.fluidbox", F.resize);
+			}
+			
+			// Animation events
+			if(Modernizr.csstransitions) {
+				F._bindAnimationEvents();
+			}
+			
+			// Touch events
+			if(F._isTouch) {
+				F._bindTouchEvents();
+			}
 		},
 		
 		/** Bind CSS3 animation events */
@@ -174,34 +217,24 @@ $(function() {
 			});
 		},
 		
-		/** Bind events */
-		_bindEvents: function() {
-		
-			// Key events
-			$(window).bind('keydown.fluidbox', function(e) {
-				if (!e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
-					if ($.inArray(e.keyCode, F._currentOptions.keys.close) > -1) {
-						F.close();
-						e.preventDefault();
-					} else if ($.inArray(e.keyCode, F._currentOptions.keys.next) > -1) {
-						F.next();
-						e.preventDefault();
-					} else if ($.inArray(e.keyCode, F._currentOptions.keys.prev) > -1) {
-						F.prev();
-						e.preventDefault();
-					}
+		/** Bind touch events */
+		_bindTouchEvents: function() {
+			F._outer.hammer({
+				drag: false,
+				transform: false,
+				swipe: true,
+				tap: false,
+				hold: false
+			});
+			
+			F._outer.on('swipe', function(e) {
+				if(e.direction == "left") {
+					F.next();
+				}
+				else if(e.direction == "right") {
+					F.prev();
 				}
 			});
-
-			// Smart resize
-			if(F._currentOptions.resize) {
-				$(window).bind("throttledresize.fluidbox", F.resize);
-			}
-			
-			// Animation events
-			if(Modernizr.csstransitions) {
-				F._bindAnimationEvents();
-			}
 		},
 		
 		/**
@@ -246,6 +279,9 @@ $(function() {
 			// Set opening / Closing
 			F._isOpening = true;
 			F._isClosing = false;
+			
+			// Check touch support and option
+			F._isTouch = typeof Hammer == 'function' && Modernizr.touch && F._currentOptions.touch;
 			
 			// Add overlay
 			F._createOverlay();
