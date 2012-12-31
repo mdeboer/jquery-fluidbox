@@ -46,6 +46,45 @@
 	background: url(../demo/images/loading.gif);
 }
 
+/** Buttons */
+#fluidbox-btn-close {
+	background-image: url(img/close.png);
+	width: 48px;
+	height: 48px;
+	position: absolute;
+	top: -24px;
+	right: -24px;
+	cursor: pointer;
+}
+
+#fluidbox-btn-next {
+	width: 150px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	right: -1px;
+	cursor: pointer;
+	background: url(img/next.png) top left repeat-y;
+	opacity: 0;
+}
+#fluidbox-btn-next:hover {
+	opacity: 1;
+}
+
+#fluidbox-btn-prev {
+	width: 150px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: -1px;
+	cursor: pointer;
+	background: url(img/prev.png) top left repeat-y;
+	opacity: 0;
+}
+#fluidbox-btn-prev:hover {
+	opacity: 1;
+}
+
 /** Animation Settings **/
 #fluidbox-overlay, #fluidbox-loading, #fluidbox-outer {
 	animation-duration: 0.5s;
@@ -55,10 +94,18 @@
 	-ms-animation-duration: 0.5s;
 }
 	
-#fluidbox-overlay.fadeOut {
+#fluidbox-overlay.closing, #fluidbox-outer.opening {
 	animation-delay: 0.3s;
 	-moz-animation-delay: 0.3s;
 	-webkit-animation-delay: 0.3s;
 	-o-animation-delay: 0.3s;
 	-ms-animation-delay: 0.3s;
+}
+
+#fluidbox-btn-next, #fluidbox-btn-prev {
+	transition: opacity 0.5s;
+	-moz-transition: opacity 0.5s;
+	-webkit-transition: opacity 0.5s;
+	-o-transition: opacity 0.5s;
+	-ms-transition: opacity 0.5s;
 }
