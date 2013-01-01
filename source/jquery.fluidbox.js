@@ -273,7 +273,7 @@ $(function() {
 			F._currentCollection = collection;
 			
 			// Merge options with defaults
-			F._currentOptions = $.extend(true, {}, F.defaults, options);
+			F._currentOptions = $.extend(true, {}, F.defaults, options);			
 			F._currentIndex = F._currentOptions.index;
 			
 			// Set opening / Closing
@@ -465,12 +465,12 @@ $(function() {
 	
 	$.fn.fluidbox = function(options) {
 		var that = $(this);
+		var options = options || {};
 		
 		this.click(function(e) {
 			e.preventDefault();
 			
 			var collection;
-			var options = options || {};
 			
 			// Filter current collection on "rel" attribute
 			if($(this).attr('rel')) {
