@@ -1,0 +1,111 @@
+#fluidbox-overlay {
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: rgba(0,0,0,0.9);
+	z-index: 8000;
+	overflow: hidden;
+}
+
+#fluidbox-outer, #fluidbox-outer-ghost {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	padding: 0px;
+	background: #fff;
+	z-index: 8010;
+	
+	animation-duration: 0.5s;
+	-moz-animation-duration: 0.5s;
+	-webkit-animation-duration: 0.5s;
+	-o-animation-duration: 0.5s;
+	-ms-animation-duration: 0.5s;
+	
+	-webkit-box-shadow: 0px 0px 30px rgba(0,0,0,0.5);
+}
+
+#fluidbox-inner img {
+	height: 100%;
+	width: 100%;
+}
+	
+#fluidbox-loading {
+	display: block;
+	width: 48px;
+	height: 48px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -24px;
+	margin-top: -24px;
+	z-index: 8005;
+	background: url(../images/loading.gif);
+}
+
+/** Buttons */
+#fluidbox-btn-close {
+	background-image: url(../images/close.png);
+	width: 48px;
+	height: 48px;
+	position: absolute;
+	top: -24px;
+	right: -24px;
+	cursor: pointer;
+}
+
+#fluidbox-btn-next {
+	width: 150px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	right: -1px;
+	cursor: pointer;
+	background: url(../images/next.png) top left repeat-y;
+	opacity: 0;
+}
+#fluidbox-btn-next:hover {
+	opacity: 1;
+}
+
+#fluidbox-btn-prev {
+	width: 150px;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: -1px;
+	cursor: pointer;
+	background: url(../images/prev.png) top left repeat-y;
+	opacity: 0;
+}
+#fluidbox-btn-prev:hover {
+	opacity: 1;
+}
+
+/** Animation Settings **/
+#fluidbox-overlay, #fluidbox-loading, #fluidbox-outer {
+	animation-duration: 0.5s;
+	-moz-animation-duration: 0.5s;
+	-webkit-animation-duration: 0.5s;
+	-o-animation-duration: 0.5s;
+	-ms-animation-duration: 0.5s;
+}
+	
+#fluidbox-overlay.closing, #fluidbox-outer.opening {
+	animation-delay: 0.3s;
+	-moz-animation-delay: 0.3s;
+	-webkit-animation-delay: 0.3s;
+	-o-animation-delay: 0.3s;
+	-ms-animation-delay: 0.3s;
+}
+
+#fluidbox-btn-next, #fluidbox-btn-prev {
+	transition: opacity 0.5s;
+	-moz-transition: opacity 0.5s;
+	-webkit-transition: opacity 0.5s;
+	-o-transition: opacity 0.5s;
+	-ms-transition: opacity 0.5s;
+}
