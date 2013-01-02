@@ -64,16 +64,16 @@ Last thing we need to do is initialize Fluidbox!
     <td>Object containing the animations for every action. Please see source code for more info.</td>
   </tr>
   <tr>
-    <td>buttons</td>
-    <td>Object</td>
-    <td>N/A</td>
-    <td>Object containing the available buttons and their positions, set to false to disable a button. Please see source code for more info.</td>
-  </tr>
-  <tr>
     <td>keys</td>
     <td>Object</td>
     <td>N/A</td>
     <td>Object containing the keycodes for every action (next, prev, close). Please see source code for more info.</td>
+  </tr>
+  <tr>
+    <td>positions</td>
+    <td>Object</td>
+    <td>N/A</td>
+    <td>Object containing positions for certain elements like buttons and title, set to false to disable an element. Please see source code for more info.</td>
   </tr>
   <tr>
     <td>preload</td>
