@@ -16,7 +16,6 @@
 	top: 50%;
 	left: 50%;
 	padding: 0px;
-	background: #fff;
 	z-index: 8010;
 	
 	animation-duration: 0.5s;
@@ -24,11 +23,18 @@
 	-webkit-animation-duration: 0.5s;
 	-o-animation-duration: 0.5s;
 	-ms-animation-duration: 0.5s;
-	
+}
+
+#fluidbox-inner {
+	box-shadow: 0px 0px 30px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0px 0px 30px rgba(0,0,0,0.5);
 	-webkit-box-shadow: 0px 0px 30px rgba(0,0,0,0.5);
+	-o-box-shadow: 0px 0px 30px rgba(0,0,0,0.5);
+	-ms-box-shadow: 0px 0px 30px rgba(0,0,0,0.5);
 }
 
 #fluidbox-inner img {
+	display: block;
 	height: 100%;
 	width: 100%;
 }
@@ -43,12 +49,30 @@
 	margin-left: -24px;
 	margin-top: -24px;
 	z-index: 8005;
-	background: url(../images/loading.gif);
+	background: url(img/loading.gif);
+}
+
+#fluidbox-title {
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: -1px;
+	width: 100%;
+	background: rgba(0,0,0,0.5);
+	color: #FFF;
+	padding: 5px 0px;
+	text-indent: 5px;
+	font-family: sans-serif;
+	opacity: 0;
+}
+
+#fluidbox-inner:hover #fluidbox-title {
+	opacity: 1;
 }
 
 /** Buttons */
 #fluidbox-btn-close {
-	background-image: url(../images/close.png);
+	background-image: url(img/close.png);
 	width: 48px;
 	height: 48px;
 	position: absolute;
@@ -64,7 +88,7 @@
 	top: 0;
 	right: -1px;
 	cursor: pointer;
-	background: url(../images/next.png) top left repeat-y;
+	background: url(img/next.png) top left repeat-y;
 	opacity: 0;
 }
 #fluidbox-btn-next:hover {
@@ -78,7 +102,7 @@
 	top: 0;
 	left: -1px;
 	cursor: pointer;
-	background: url(../images/prev.png) top left repeat-y;
+	background: url(img/prev.png) top left repeat-y;
 	opacity: 0;
 }
 #fluidbox-btn-prev:hover {
@@ -102,7 +126,7 @@
 	-ms-animation-delay: 0.3s;
 }
 
-#fluidbox-btn-next, #fluidbox-btn-prev {
+#fluidbox-btn-next, #fluidbox-btn-prev, #fluidbox-title {
 	transition: opacity 0.5s;
 	-moz-transition: opacity 0.5s;
 	-webkit-transition: opacity 0.5s;
