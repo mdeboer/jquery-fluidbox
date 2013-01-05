@@ -14,21 +14,25 @@
  */
 
 $(function() {
-
+	"use strict";
+	
 	var F = $.fluidbox = function() {
 		F.open.apply(this, arguments);
 	};
 	
 	$.extend(F, {
-
+	
+		/** Working set */
 		_currentCollection: {},
 		_currentIndex: null,
 		_currentOptions: {},
 		
+		/** States */
 		_isLoading: false,
 		_isOpening: false,
 		_isClosing: false,
 		_isTouch: false,
+		_isAnimated: false,
 		
 		/** Quick access variables for layout */
 		_overlay: {},
@@ -36,12 +40,23 @@ $(function() {
 		_inner: {},
 		_loading: {},
 		
+		/** Animation classes */
+		_animClasses: "animated flash bounce shake tada swing wobble wiggle pulse flip flipInX flipOutX flipInY flipOutY fadeIn fadeInUp fadeInDown fadeInLeft fadeInRight fadeInUpBig fadeInDownBig fadeInLeftBig fadeInRightBig fadeOut fadeOutUp fadeOutDown fadeOutLeft fadeOutRight fadeOutUpBig fadeOutDownBig fadeOutLeftBig fadeOutRightBig bounceIn bounceInDown bounceInUp bounceInLeft bounceInRight bounceOut bounceOutDown bounceOutUp bounceOutLeft bounceOutRight rotateIn rotateInDownLeft rotateInDownRight rotateInUpLeft rotateInUpRight rotateOut rotateOutDownLeft rotateOutDownRight rotateOutUpLeft rotateOutUpRight lightSpeedIn lightSpeedOut hinge rollIn rollOut",
+		
+		/** Animation end events */
+		_transEndEventNames: {
+			'WebkitAnimation' : 'webkitAnimationEnd',
+			'MozAnimation'    : 'animationend',
+			'OAnimation'      : 'oanimationend',
+			'msAnimation'     : 'MSAnimationEnd',
+			'animation'       : 'animationend'
+		},
+		
 		/** Default options */
 		defaults: {
 			resize: true,
 			preload: true,
 			touch: true,
-			touchButtons: true,
 			templates: {
 				inner: '<div id="fluidbox-inner"></div>',
 				outer: '<div id="fluidbox-outer"></div>',
@@ -58,7 +73,7 @@ $(function() {
 				buttons: {
 					close: 'outer',
 					next: 'inner',
-					prev: 'inner',
+					prev: 'inner'
 				},
 				title: 'inner'
 			},
@@ -71,12 +86,12 @@ $(function() {
 				open: 'fadeIn',
 				close: 'fadeOut',
 				next: {
-					in: 'fadeInRight',
-					out: 'fadeOutLeft'
+					'in': 'fadeInRight',
+					'out': 'fadeOutLeft'
 				},
 				prev: {
-					in: 'fadeInLeft',
-					out: 'fadeOutRight'
+					'in': 'fadeInLeft',
+					'out': 'fadeOutRight'
 				}
 			}
 		},
@@ -86,13 +101,13 @@ $(function() {
 			$(F._currentCollection).trigger("fluidboxBeforeCreate");
 		
 			// Outer (containing inner)
-			if($('#fluidbox-outer').length == 0) {
+			if($('#fluidbox-outer').length === 0) {
 				$('body').append(F._currentOptions.templates.outer);
 				$('#fluidbox-outer').append(F._currentOptions.templates.inner);
 			}
 			
 			// Overlay
-			if($('#fluidbox-overlay').length == 0) {
+			if($('#fluidbox-overlay').length === 0) {
 				$('body').append(F._currentOptions.templates.overlay);
 				$('#fluidbox-overlay').click(function() {
 					F.close();
@@ -100,35 +115,33 @@ $(function() {
 			}
 			
 			// Loading
-			if($('#fluidbox-loading').length == 0) {
+			if($('#fluidbox-loading').length === 0) {
 				$('body').append(F._currentOptions.templates.loading);
 			}
 			
 			// Title
-			if($('#fluidbox-title').length == 0 && F._currentOptions.positions.title !== false) {
+			if($('#fluidbox-title').length === 0 && F._currentOptions.positions.title !== false) {
 				$('#fluidbox-'+ F._currentOptions.positions.title).append(F._currentOptions.templates.title);
 			}
 			
 			// Navigation buttons
-			if(!F._isTouch || F._isTouch && F._currentOptions.touchButtons) {
-				if(F._currentOptions.positions.buttons.close !== false) {
-					$('#fluidbox-'+ F._currentOptions.positions.buttons.close).append(F._currentOptions.templates.buttons.close);
-					$('#fluidbox-btn-close').click(function() {
-						F.close();
-					});				
-				}
-				if(F._currentOptions.positions.buttons.next !== false) {
-					$('#fluidbox-'+ F._currentOptions.positions.buttons.next).append(F._currentOptions.templates.buttons.next);
-					$('#fluidbox-btn-next').click(function() {
-						F.next();
-					});
-				}	
-				if(F._currentOptions.positions.buttons.prev !== false) {
-					$('#fluidbox-'+ F._currentOptions.positions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
-					$('#fluidbox-btn-prev').click(function() {
-						F.prev();
-					});
-				}
+			if(F._currentOptions.positions.buttons.close !== false) {
+				$('#fluidbox-'+ F._currentOptions.positions.buttons.close).append(F._currentOptions.templates.buttons.close);
+				$('#fluidbox-btn-close').click(function() {
+					F.close();
+				});				
+			}
+			if(F._currentOptions.positions.buttons.next !== false) {
+				$('#fluidbox-'+ F._currentOptions.positions.buttons.next).append(F._currentOptions.templates.buttons.next);
+				$('#fluidbox-btn-next').click(function() {
+					F.next();
+				});
+			}	
+			if(F._currentOptions.positions.buttons.prev !== false) {
+				$('#fluidbox-'+ F._currentOptions.positions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
+				$('#fluidbox-btn-prev').click(function() {
+					F.prev();
+				});
 			}
 			
 			// Helper vars
@@ -151,11 +164,9 @@ $(function() {
 			F._overlay.unbind('click');
 			
 			// Unbind navigation buttons
-			if(!F._isTouch || F._isTouch && F._currentOptions.touchButtons) {
-				$(F._currentOptions.templates.buttons.close).unbind('click');
-				$(F._currentOptions.templates.buttons.next).unbind('click');
-				$(F._currentOptions.templates.buttons.prev).unbind('click');
-			}
+			$(F._currentOptions.templates.buttons.close).unbind('click');
+			$(F._currentOptions.templates.buttons.next).unbind('click');
+			$(F._currentOptions.templates.buttons.prev).unbind('click');
 		},
 		
 		/** Bind events */
@@ -184,7 +195,7 @@ $(function() {
 			}
 			
 			// Animation events
-			if(Modernizr.csstransitions) {
+			if(F._isAnimated !== false) {
 				F._bindAnimationEvents();
 			}
 			
@@ -198,9 +209,13 @@ $(function() {
 		
 		/** Bind CSS3 animation events */
 		_bindAnimationEvents: function() {
+			if(F._isAnimated === false) {
+				return;
+			}
+		
 			// Animation completed event
-			$(document).bind('oanimationend animationend webkitAnimationEnd MSAnimationEnd', function(e) {			
-				$(e.target).removeClass();
+			$(document).bind(F._transEndEventNames[Modernizr.prefixed('animation')], function(e) {
+				$(e.target).removeClass(F._animClasses);
 				
 				// Loading
 				if($(e.target).is(F._loading)) {
@@ -218,7 +233,7 @@ $(function() {
 						
 						$('html').css({ overflow: '' });
 						
-						$(document).unbind('oanimationend animationend webkitAnimationEnd MSAnimationEnd');
+						$(document).unbind(F._transEndEventNames[Modernizr.prefixed('animation')]);
 					}
 				}
 				
@@ -228,7 +243,7 @@ $(function() {
 						F._outer.remove();
 					}
 				}
-				
+
 				// Outer ghost (out-animation ghost)
 				if($(e.target).is($('#fluidbox-outer-ghost'))) {
 					$('#fluidbox-outer-ghost').remove();
@@ -247,10 +262,10 @@ $(function() {
 			});
 			
 			F._outer.on('swipe', function(e) {
-				if(e.direction == "left") {
+				if(e.direction === "left") {
 					F.next();
 				}
-				else if(e.direction == "right") {
+				else if(e.direction === "right") {
 					F.prev();
 				}
 			});
@@ -261,25 +276,35 @@ $(function() {
 		 * @param bool loading Set true if loading (show), false for not loading (hide)
 		 */
 		_showLoading: function(loading) {			
-			if(typeof loading == "undefined") {
-				var loading = true;
+			if(typeof loading === "undefined") {
+				loading = true;
 			}
 			
 			F._isLoading = loading;
-			F._loading.removeClass();
+			F._loading.removeClass(F._animClasses);
 			
 			if(F._isLoading) {
-				F._loading.addClass('animated fadeIn');
-				F._loading.show();
+				if(F._isAnimated !== false) {
+					F._loading.removeClass(F._animClasses).addClass('animated fadeIn');
+					F._loading.show();
+				} else {
+					F._loading.show();
+				}
 			} else {
-				F._loading.addClass('animated fadeOut');
+				if(F._isAnimated !== false) {
+					F._loading.removeClass(F._animClasses).addClass('animated fadeOut');
+					// Hide triggered on callback
+				} else {
+					F._loading.hide();
+				}				
 			}
 		},
 		
 		/** Preload collection */
 		_preloadCollection: function() {
-			for(var i = 0; i < F._currentCollection.length; i++) {
-				var img = new Image();
+			var i = 0, img;
+			for(i = 0; i < F._currentCollection.length; i = i + 1) {
+				img = new Image();
 				img.src = $(F._currentCollection[i]).attr('href');
 			}
 		},
@@ -300,7 +325,10 @@ $(function() {
 			F._isClosing = false;
 			
 			// Check touch support and option
-			F._isTouch = typeof Hammer == 'function' && Modernizr.touch && F._currentOptions.touch;
+			F._isTouch = typeof Hammer === 'function' && Modernizr.touch && F._currentOptions.touch;
+			
+			// Check animation support
+			F._isAnimated = F._currentOptions.animation !== false && Modernizr.csstransitions;
 			
 			// Add overlay
 			F._createOverlay();
@@ -308,8 +336,12 @@ $(function() {
 			$(F._currentCollection).trigger("fluidboxBeforeOpen");
 			
 			// Show overlay
-			F._overlay.addClass('animated fadeIn opening');
-			F._overlay.show();
+			if(F._isAnimated !== false) {
+				F._overlay.removeClass(F._animClasses).addClass('animated fadeIn opening');
+				F._overlay.show();
+			} else {
+				F._overlay.show();
+			}
 			
 			// Disable overflow on HTML
 			$('html').css({ overflow: 'hidden' });
@@ -336,14 +368,22 @@ $(function() {
 			F._isClosing = true;
 			
 			// Animate overlay and loading image
-			F._overlay.removeClass().addClass('animated fadeOut closing');
+			if(F._isAnimated !== false) {
+				F._overlay.removeClass(F._animClasses).addClass('animated fadeOut closing');
+			} else {
+				F._overlay.hide();
+			}
 			
 			// Animate image or loading image
 			if(!F._isLoading) {
-				F._outer.removeClass().addClass('animated ' + F._currentOptions.animation.close + ' closing');
+				if(F._isAnimated !== false) {
+					F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.close + ' closing');
+				} else {
+					F._outer.hide();
+				}
 			}
 			else {
-				F._loading.removeClass().addClass('animated fadeOut');
+				F._showLoading(false);
 			}
 				
 			F._unbindEvents();
@@ -356,10 +396,11 @@ $(function() {
 		 * @param string animDirection Animation direction (up | down | left | right)
 		 */
 		next: function() {
-			if(F._currentCollection.length <= 1)
+			if(F._currentCollection.length <= 1) {
 				return;
+			}
 				
-			F.show(F._currentIndex == F._currentCollection.length - 1 ? 0 : F._currentIndex + 1, 'next');
+			F.show(F._currentIndex === F._currentCollection.length - 1 ? 0 : F._currentIndex + 1, 'next');
 		},
 		
 		/** 
@@ -367,10 +408,11 @@ $(function() {
 		 * @param string animDirection Animation direction (up | down | left | right)
 		 */
 		prev: function() {
-			if(F._currentCollection.length <= 1)
+			if(F._currentCollection.length <= 1) {
 				return;
+			}
 			
-			F.show(F._currentIndex == 0 ? F._currentCollection.length - 1 : F._currentIndex - 1, 'prev');
+			F.show(F._currentIndex === 0 ? F._currentCollection.length - 1 : F._currentIndex - 1, 'prev');
 		},
 		
 		/** 
@@ -379,8 +421,9 @@ $(function() {
 		 * @param string direction Optional direction parameter (next | prev | open)
 		 */
 		show: function(index, direction) {			
-			if(index == 'undefined' || index < 0 || index > F._currentCollection.length)
+			if(index === 'undefined' || index < 0 || index > F._currentCollection.length) {
 				index = 0;
+			}
 			
 			// Determine direction
 			if(!direction) {
@@ -392,39 +435,51 @@ $(function() {
 				}
 			}
 			
-			console.log(F._inner.html());
-			
 			// Set current index
 			F._currentIndex = index;
 			
+			// Set variables
+			var currentElement, currentImage, oldOverlay;
+			
 			// Fade out previous item
 			if(direction !== 'open') {
-				F._outer.removeClass();
-				
+
 				// Animate
-				if(direction == 'prev')
-					F._outer.addClass('animated ' + F._currentOptions.animation.prev.out);	
-				else if(direction == 'next')
-					F._outer.addClass('animated ' + F._currentOptions.animation.next.out);
-				
+				if(F._isAnimated !== false) {
+					if(direction === 'prev') {
+						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.prev.out);
+					}
+					else if(direction === 'next') {
+						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.next.out);
+					}
+				} else {
+					F._outer.hide();
+				}
+
 				// Fade out ghost overlay (previous image) if previous image is not still loading
 				if(!F._isLoading) {
 				
 					// Clone existing overlay
-					var oldOverlay = $(F._outer).clone(true);
+					oldOverlay = $(F._outer).clone(true);
 					
 					// Set unique ID
 					$(oldOverlay).attr('id', 'fluidbox-outer-ghost');
 					
-					// Animate
-					$(oldOverlay).removeClass();
-					if(direction == 'prev')
-						$(oldOverlay).addClass('animated ' + F._currentOptions.animation.prev.out);
-					else if(direction == 'next')
-						$(oldOverlay).addClass('animated ' + F._currentOptions.animation.next.out);
-						
-					$(oldOverlay).show();
 					$('body').append(oldOverlay);
+					
+					// Animate
+					if(F._isAnimated !== false) {
+						if(direction === 'prev') {
+							$(oldOverlay).removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.prev.out);
+						}
+						else if(direction === 'next') {
+							$(oldOverlay).removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.next.out);
+						}
+						
+						$(oldOverlay).show();
+					} else {
+						$(oldOverlay).remove();
+					}
 				}
 			}
 			
@@ -436,10 +491,10 @@ $(function() {
 			F._inner.children('img').first().remove();
 			
 			// Preload image and show when loaded
-			var currentElement = F._currentCollection[index];
-			var currentImage = new Image();			
+			currentElement = F._currentCollection[index];
+			currentImage = new Image();	
 			currentImage.onload = function() {
-				$(F._currentCollection).trigger("fluidboxBeforeShow", index, direction, this);
+				$(F._currentCollection).trigger("fluidboxBeforeShow", { index: index, direction: direction, image: this });
 				
 				// Replace image and animate
 				F._inner.append('<img src="'+$(currentElement).attr('href')+'" width="'+this.width+'" height="'+this.height+'" />');
@@ -447,27 +502,34 @@ $(function() {
 				// Set title
 				F._title.append($(currentElement).attr('title'));
 				
-				// Animate
-				F._outer.removeClass();				
-				if(direction == 'open')
-					F._outer.addClass('animated ' + F._currentOptions.animation.open + ' opening');
-				else if(direction == 'prev')
-					F._outer.addClass('animated ' + F._currentOptions.animation.prev.in);
-				else if(direction == 'next')
-					F._outer.addClass('animated ' + F._currentOptions.animation.next.in);
+				// Animate			
+				if(F._isAnimated !== false) {
+					if(direction === 'open') {
+						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.open + ' opening');
+					}
+					else if(direction === 'prev') {
+						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.prev['in']);
+					}
+					else if(direction === 'next') {
+						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.next['in']);
+					}
+					
+					F._outer.show();
+				} else {
+					F._outer.show();
+				}
 				
 				// Hide loading
 				F._showLoading(false);
 				
-				// Show new image
-				F._outer.show();
-				
 				// Resize image
-				if(F._currentOptions.resize) 
+				if(F._currentOptions.resize) {
 					F.resize();
+				}
 					
-				$(F._currentCollection).trigger("fluidboxAfterShow", index, direction, this);
-			}
+				$(F._currentCollection).trigger("fluidboxAfterShow", { index: index, direction: direction, image: this });
+			};
+			
 			currentImage.src = $(currentElement).attr('href');
 			
 			// Show loading indicator
@@ -476,14 +538,18 @@ $(function() {
 		
 		/** Resize the overlay */
 		resize: function() {
-			var origWidth = $(F._inner).children('img').attr('width');
-			var origHeight = $(F._inner).children('img').attr('height');
+			var origWidth, origHeight,
+				winWidth, winHeight,
+				iRatio;
+		
+			origWidth = $(F._inner).children('img').attr('width');
+			origHeight = $(F._inner).children('img').attr('height');
 			
-			var winWidth = $(window).width();
-			var winHeight = $(window).height() - (F._outer.height() - F._inner.height());
+			winWidth = $(window).width();
+			winHeight = $(window).height() - (F._outer.height() - F._inner.height());
 			
 			if(origWidth > winWidth || origHeight > winHeight) {
-				var iRatio = Math.min(winWidth / origWidth, winHeight / origHeight);
+				iRatio = Math.min(winWidth / origWidth, winHeight / origHeight);
 				F._outer.css({
 					'width': F._outer.width(origWidth * iRatio),
 					'margin-left': '-' + (origWidth * iRatio) / 2 + 'px',
@@ -500,8 +566,8 @@ $(function() {
 	});
 	
 	$.fn.fluidbox = function(options) {
-		var that = $(this);
-		var options = options || {};
+		var that = $(this);	
+		options = options || {};
 		
 		this.click(function(e) {
 			e.preventDefault();
