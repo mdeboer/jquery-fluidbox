@@ -572,15 +572,16 @@ $(function() {
 		this.click(function(e) {
 			e.preventDefault();
 			
-			var collection;
+			var collection = [ this ];
 			
 			// Filter current collection on "rel" attribute
 			if($(this).attr('rel')) {
 				collection = that.filter('[rel='+ $(this).attr('rel') +']');
+				// Set opening index
+				options.index = collection.index(this);
+			} else {
+				options.index = 0;
 			}
-			
-			// Set opening index
-			options.index = collection.index(this);
 			
 			$.fluidbox(collection, options);
 		});

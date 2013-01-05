@@ -3,6 +3,8 @@ Fluidbox is a simple, lightweight but modern lightbox plugin written in javascri
 
 Demo page: <http://mdeboer.github.com/jquery-fluidbox/>
 
+Images on demo page courtesy of Maarten de Boer <info@maartendeboer.net>
+
 Copyright (c) 2012 - 2013 Maarten de Boer - <info@maartendeboer.net>
 
 ## Features
