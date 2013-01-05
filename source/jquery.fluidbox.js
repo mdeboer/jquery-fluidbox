@@ -125,23 +125,27 @@ $(function() {
 			}
 			
 			// Navigation buttons
+			
 			if(F._currentOptions.positions.buttons.close !== false) {
 				$('#fluidbox-'+ F._currentOptions.positions.buttons.close).append(F._currentOptions.templates.buttons.close);
 				$('#fluidbox-btn-close').click(function() {
 					F.close();
 				});				
 			}
-			if(F._currentOptions.positions.buttons.next !== false) {
-				$('#fluidbox-'+ F._currentOptions.positions.buttons.next).append(F._currentOptions.templates.buttons.next);
-				$('#fluidbox-btn-next').click(function() {
-					F.next();
-				});
-			}	
-			if(F._currentOptions.positions.buttons.prev !== false) {
-				$('#fluidbox-'+ F._currentOptions.positions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
-				$('#fluidbox-btn-prev').click(function() {
-					F.prev();
-				});
+			
+			if(F._currentCollection.length > 1) {
+				if(F._currentOptions.positions.buttons.next !== false) {
+					$('#fluidbox-'+ F._currentOptions.positions.buttons.next).append(F._currentOptions.templates.buttons.next);
+					$('#fluidbox-btn-next').click(function() {
+						F.next();
+					});
+				}	
+				if(F._currentOptions.positions.buttons.prev !== false) {
+					$('#fluidbox-'+ F._currentOptions.positions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
+					$('#fluidbox-btn-prev').click(function() {
+						F.prev();
+					});
+				}
 			}
 			
 			// Helper vars
@@ -179,10 +183,10 @@ $(function() {
 					if ($.inArray(e.keyCode, F._currentOptions.keys.close) > -1) {
 						F.close();
 						e.preventDefault();
-					} else if ($.inArray(e.keyCode, F._currentOptions.keys.next) > -1) {
+					} else if (F._currentCollection.length > 1 && $.inArray(e.keyCode, F._currentOptions.keys.next) > -1) {
 						F.next();
 						e.preventDefault();
-					} else if ($.inArray(e.keyCode, F._currentOptions.keys.prev) > -1) {
+					} else if (F._currentCollection.length > 1 && $.inArray(e.keyCode, F._currentOptions.keys.prev) > -1) {
 						F.prev();
 						e.preventDefault();
 					}
@@ -215,7 +219,7 @@ $(function() {
 		
 			// Animation completed event
 			$(document).bind(F._transEndEventNames[Modernizr.prefixed('animation')], function(e) {
-				$(e.target).removeClass(F._animClasses);
+				$(e.target).removeClass(F._animClasses).removeClass('opening closing');
 				
 				// Loading
 				if($(e.target).is(F._loading)) {
@@ -375,7 +379,7 @@ $(function() {
 			}
 			
 			// Animate image or loading image
-			if(!F._isLoading) {
+			if(F._isLoading === false) {
 				if(F._isAnimated !== false) {
 					F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.close + ' closing');
 				} else {
