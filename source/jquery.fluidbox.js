@@ -16,11 +16,7 @@
 $(function() {
 	"use strict";
 	
-	var F = $.fluidbox = function() {
-		F.open.apply(this, arguments);
-	};
-	
-	$.extend(F, {
+	var F = $.fluidbox = {
 	
 		/** Working set */
 		_currentCollection: {},
@@ -39,6 +35,7 @@ $(function() {
 		_outer: {},
 		_inner: {},
 		_loading: {},
+		_title: {},
 		
 		/** Animation classes */
 		_animClasses: "animated flash bounce shake tada swing wobble wiggle pulse flip flipInX flipOutX flipInY flipOutY fadeIn fadeInUp fadeInDown fadeInLeft fadeInRight fadeInUpBig fadeInDownBig fadeInLeftBig fadeInRightBig fadeOut fadeOutUp fadeOutDown fadeOutLeft fadeOutRight fadeOutUpBig fadeOutDownBig fadeOutLeftBig fadeOutRightBig bounceIn bounceInDown bounceInUp bounceInLeft bounceInRight bounceOut bounceOutDown bounceOutUp bounceOutLeft bounceOutRight rotateIn rotateInDownLeft rotateInDownRight rotateInUpLeft rotateInUpRight rotateOut rotateOutDownLeft rotateOutDownRight rotateOutUpLeft rotateOutUpRight lightSpeedIn lightSpeedOut hinge rollIn rollOut",
@@ -98,7 +95,7 @@ $(function() {
 		
 		/** Injects necessary html templates for the overlay */
 		_createOverlay: function() {
-			$(F._currentCollection).trigger("fluidboxBeforeCreate");
+			$(F._currentCollection).first().trigger("fluidboxBeforeCreate");
 		
 			// Outer (containing inner)
 			if($('#fluidbox-outer').length === 0) {
@@ -125,7 +122,6 @@ $(function() {
 			}
 			
 			// Navigation buttons
-			
 			if(F._currentOptions.positions.buttons.close !== false) {
 				$('#fluidbox-'+ F._currentOptions.positions.buttons.close).append(F._currentOptions.templates.buttons.close);
 				$('#fluidbox-btn-close').click(function() {
@@ -155,7 +151,7 @@ $(function() {
 			F._loading = $('#fluidbox-loading');
 			F._title = $('#fluidbox-title');
 			
-			$(F._currentCollection).trigger("fluidboxAfterCreate");
+			$(F._currentCollection).first().trigger("fluidboxAfterCreate");
 		},
 		
 		/** Clean up bound events */
@@ -175,7 +171,7 @@ $(function() {
 		
 		/** Bind events */
 		_bindEvents: function() {
-			$(F._currentCollection).trigger("fluidboxBeforeBind");
+			$(F._currentCollection).first().trigger("fluidboxBeforeBind");
 		
 			// Key events
 			$(window).bind('keydown.fluidbox', function(e) {
@@ -208,7 +204,7 @@ $(function() {
 				F._bindTouchEvents();
 			}
 			
-			$(F._currentCollection).trigger("fluidboxAfterBind");
+			$(F._currentCollection).first().trigger("fluidboxAfterBind");
 		},
 		
 		/** Bind CSS3 animation events */
@@ -249,8 +245,8 @@ $(function() {
 				}
 
 				// Outer ghost (out-animation ghost)
-				if($(e.target).is($('#fluidbox-outer-ghost'))) {
-					$('#fluidbox-outer-ghost').remove();
+				if($(e.target).hasClass('fluidbox-outer-ghost')) {
+					$(e.target).remove();
 				}				
 			});
 		},
@@ -337,7 +333,7 @@ $(function() {
 			// Add overlay
 			F._createOverlay();
 			
-			$(F._currentCollection).trigger("fluidboxBeforeOpen");
+			$(F._currentCollection).first().trigger("fluidboxBeforeOpen");
 			
 			// Show overlay
 			if(F._isAnimated !== false) {
@@ -361,12 +357,12 @@ $(function() {
 				F._preloadCollection();
 			}
 			
-			$(F._currentCollection).trigger("fluidboxAfterOpen");
+			$(F._currentCollection).first().trigger("fluidboxAfterOpen");
 		},
 		
 		/** Close overlay and unbind events */
 		close: function() {
-			$(F._currentCollection).trigger("fluidboxBeforeClose");
+			$(F._currentCollection).first().trigger("fluidboxBeforeClose");
 		
 			// Set closing
 			F._isClosing = true;
@@ -381,7 +377,7 @@ $(function() {
 			// Animate image or loading image
 			if(F._isLoading === false) {
 				if(F._isAnimated !== false) {
-					F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.close + ' closing');
+					F._outer.removeClass(F._animClasses).addClass('animated ' + $(F._outer).data('animation').close + ' closing');
 				} else {
 					F._outer.hide();
 				}
@@ -392,7 +388,7 @@ $(function() {
 				
 			F._unbindEvents();
 			
-			$(F._currentCollection).trigger("fluidboxAfterClose");
+			$(F._currentCollection).first().trigger("fluidboxAfterClose");
 		},
 		
 		/** 
@@ -443,48 +439,38 @@ $(function() {
 			F._currentIndex = index;
 			
 			// Set variables
-			var currentElement, currentImage, oldOverlay;
+			var currentElement = F._currentCollection[index],
+				currentImage = new Image(),
+				oldOuter = $(F._outer).clone(true);
 			
 			// Fade out previous item
-			if(direction !== 'open') {
-
+			if(direction !== 'open' && !F._isLoading) {
+				$(F).trigger("fluidboxBeforeHide");
+				
+				$(F._outer).removeClass(F._animClasses);
+				$(F._outer).hide();
+				
+				$(oldOuter).removeAttr('id');
+				$(oldOuter).addClass('fluidbox-outer-ghost');
+				$(oldOuter).removeClass(F._animClasses);
+				
+				$('body').append(oldOuter);
+				
 				// Animate
 				if(F._isAnimated !== false) {
 					if(direction === 'prev') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.prev.out);
+						$(oldOuter).addClass('animated ' + $(oldOuter).data('animation').prev.out);
 					}
 					else if(direction === 'next') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.next.out);
+						$(oldOuter).addClass('animated ' + $(oldOuter).data('animation').next.out);
 					}
+					
+					$(oldOuter).show();
 				} else {
-					F._outer.hide();
+					$(oldOuter).remove();
 				}
-
-				// Fade out ghost overlay (previous image) if previous image is not still loading
-				if(!F._isLoading) {
 				
-					// Clone existing overlay
-					oldOverlay = $(F._outer).clone(true);
-					
-					// Set unique ID
-					$(oldOverlay).attr('id', 'fluidbox-outer-ghost');
-					
-					$('body').append(oldOverlay);
-					
-					// Animate
-					if(F._isAnimated !== false) {
-						if(direction === 'prev') {
-							$(oldOverlay).removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.prev.out);
-						}
-						else if(direction === 'next') {
-							$(oldOverlay).removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.next.out);
-						}
-						
-						$(oldOverlay).show();
-					} else {
-						$(oldOverlay).remove();
-					}
-				}
+				$(F).trigger("fluidboxAfterHide");
 			}
 			
 			// Reset title
@@ -495,27 +481,33 @@ $(function() {
 			F._inner.children('img').first().remove();
 			
 			// Preload image and show when loaded
-			currentElement = F._currentCollection[index];
-			currentImage = new Image();	
 			currentImage.onload = function() {
-				$(F._currentCollection).trigger("fluidboxBeforeShow", { index: index, direction: direction, image: this });
+				
+				// Set current image data
+				var eventData = { index: index, target: currentElement, direction: direction, image: this, title: $(currentElement).attr('title'), animation: $.extend(true, {}, F._currentOptions.animation) };
+				
+				// Trigger callback
+				$(F).trigger("fluidboxBeforeShow", eventData);
+				
+				// Set animation options for current item
+				$(F._outer).data('animation', $.extend(true, {}, F.defaults.animation, eventData.animation));
 				
 				// Replace image and animate
 				F._inner.append('<img src="'+$(currentElement).attr('href')+'" width="'+this.width+'" height="'+this.height+'" />');
 				
 				// Set title
-				F._title.append($(currentElement).attr('title'));
+				F._title.append(eventData.title);
 				
 				// Animate			
 				if(F._isAnimated !== false) {
 					if(direction === 'open') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.open + ' opening');
+						F._outer.removeClass(F._animClasses).addClass('animated ' + eventData.animation.open + ' opening');
 					}
 					else if(direction === 'prev') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.prev['in']);
+						F._outer.removeClass(F._animClasses).addClass('animated ' + eventData.animation.prev['in']);
 					}
 					else if(direction === 'next') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + F._currentOptions.animation.next['in']);
+						F._outer.removeClass(F._animClasses).addClass('animated ' + eventData.animation.next['in']);
 					}
 					
 					F._outer.show();
@@ -531,7 +523,7 @@ $(function() {
 					F.resize();
 				}
 					
-				$(F._currentCollection).trigger("fluidboxAfterShow", { index: index, direction: direction, image: this });
+				$(F).trigger("fluidboxAfterShow", eventData);
 			};
 			
 			currentImage.src = $(currentElement).attr('href');
@@ -567,7 +559,7 @@ $(function() {
 				});
 			}
 		}
-	});
+	};
 	
 	$.fn.fluidbox = function(options) {
 		var that = $(this);	
@@ -587,8 +579,10 @@ $(function() {
 				options.index = 0;
 			}
 			
-			$.fluidbox(collection, options);
+			$.fluidbox.open(collection, options);
 		});
+		
+		return $($.fluidbox);
 	};
 	
 });
