@@ -484,7 +484,7 @@ $(function() {
 			currentImage.onload = function() {
 				
 				// Set current image data
-				var eventData = { index: index, target: currentElement, direction: direction, image: this, title: $(currentElement).attr('title'), animation: $.extend(true, {}, F._currentOptions.animation) };
+				var eventData = { index: index, target: currentElement, direction: direction, image: this, title: $(currentElement).attr('title'), animation: $.extend(true, {}, F._currentOptions.animation, $(currentElement).data('animation')) };
 				
 				// Trigger callback
 				$(F).trigger("fluidboxBeforeShow", eventData);
@@ -501,13 +501,13 @@ $(function() {
 				// Animate			
 				if(F._isAnimated !== false) {
 					if(direction === 'open') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + eventData.animation.open + ' opening');
+						F._outer.removeClass(F._animClasses).addClass('animated ' + $(F._outer).data('animation').open + ' opening');
 					}
 					else if(direction === 'prev') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + eventData.animation.prev['in']);
+						F._outer.removeClass(F._animClasses).addClass('animated ' + $(F._outer).data('animation').prev['in']);
 					}
 					else if(direction === 'next') {
-						F._outer.removeClass(F._animClasses).addClass('animated ' + eventData.animation.next['in']);
+						F._outer.removeClass(F._animClasses).addClass('animated ' + $(F._outer).data('animation').next['in']);
 					}
 					
 					F._outer.show();
