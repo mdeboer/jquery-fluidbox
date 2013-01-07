@@ -52,7 +52,7 @@
 				$('#navigation').parent('.well').affix();
 			}
 		
-			$('#navigation li').click(function() {
+			$('#navigation li:not(.divider, .nav-header)').click(function() {
 				
 				$('#navigation li').removeClass('active');
 				$(this).addClass('active');
