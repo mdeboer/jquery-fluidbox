@@ -120,7 +120,7 @@ $(function() {
 			}
 			
 			// Navigation buttons
-			if(F._currentOptions.positions.buttons.close !== false && $('#fluidbox-loading').length === 0) {
+			if(F._currentOptions.positions.buttons.close !== false && $('#fluidbox-btn-close').length === 0) {
 				$('#fluidbox-'+ F._currentOptions.positions.buttons.close).append(F._currentOptions.templates.buttons.close);
 			}
 			
