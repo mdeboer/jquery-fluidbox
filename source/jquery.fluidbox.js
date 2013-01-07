@@ -269,7 +269,7 @@ $(function() {
 			
 			F._outer.bind('dragstart', function() {
 				return false;
-			})
+			});
 			
 			F._outer.bind('swipe', function(e) {
 				e.preventDefault();
@@ -356,7 +356,7 @@ $(function() {
 			}
 			
 			// Save current scroll position (firefox 'unwanted feature')
-			var scrollX = $('body').scrollLeft();
+			var scrollX = $('body').scrollLeft(),
 				scrollY = $('body').scrollTop();
 			
 			// Disable overflow on HTML
