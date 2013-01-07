@@ -168,6 +168,12 @@ $(function() {
 			$(F._currentOptions.templates.buttons.close).unbind('click');
 			$(F._currentOptions.templates.buttons.next).unbind('click');
 			$(F._currentOptions.templates.buttons.prev).unbind('click');
+			
+			// Touch events
+			if(F._isTouch) {
+				$(F._outer).unbind('swipe');
+				$(F._outer).unbind('dragstart');
+			}
 		},
 		
 		/** Bind events */
@@ -231,8 +237,7 @@ $(function() {
 						F._overlay.remove();
 						F._outer.remove();
 						F._loading.remove();
-						
-						$('html').css({ overflow: '' });
+						$('body').css({ overflow: '' });
 						
 						$(document).unbind(F._transEndEventNames[Modernizr.prefixed('animation')]);
 					}
@@ -262,7 +267,12 @@ $(function() {
 				hold: false
 			});
 			
-			F._outer.on('swipe', function(e) {
+			F._outer.bind('dragstart', function() {
+				return false;
+			})
+			
+			F._outer.bind('swipe', function(e) {
+				e.preventDefault();
 				if(e.direction === "left") {
 					F.next();
 				}
@@ -345,8 +355,16 @@ $(function() {
 				F._overlay.show();
 			}
 			
+			// Save current scroll position (firefox 'unwanted feature')
+			var scrollX = $('body').scrollLeft();
+				scrollY = $('body').scrollTop();
+			
 			// Disable overflow on HTML
-			$('html').css({ overflow: 'hidden' });
+			$('body').css({ overflow: 'hidden' });
+			
+			// Restore scroll position
+			$('body').scrollLeft(scrollX);
+			$('body').scrollTop(scrollY);			
 			
 			// Show image
 			F.show(F._currentIndex, 'open');
