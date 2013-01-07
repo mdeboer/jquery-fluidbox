@@ -22,6 +22,7 @@ $(function() {
 		_currentCollection: {},
 		_currentIndex: null,
 		_currentOptions: {},
+		_instance: {},
 		
 		/** States */
 		_isLoading: false,
@@ -95,7 +96,7 @@ $(function() {
 		
 		/** Injects necessary html templates for the overlay */
 		_createOverlay: function() {
-			$(F._currentCollection).first().trigger("fluidboxBeforeCreate");
+			$(F._instance).triggerHandler("fluidboxBeforeCreate");
 		
 			// Outer (containing inner)
 			if($('#fluidbox-outer').length === 0) {
@@ -151,7 +152,7 @@ $(function() {
 			F._loading = $('#fluidbox-loading');
 			F._title = $('#fluidbox-title');
 			
-			$(F._currentCollection).first().trigger("fluidboxAfterCreate");
+			$(F._instance).triggerHandler("fluidboxAfterCreate");
 		},
 		
 		/** Clean up bound events */
@@ -171,7 +172,7 @@ $(function() {
 		
 		/** Bind events */
 		_bindEvents: function() {
-			$(F._currentCollection).first().trigger("fluidboxBeforeBind");
+			$(F._instance).triggerHandler("fluidboxBeforeBind");
 		
 			// Key events
 			$(window).bind('keydown.fluidbox', function(e) {
@@ -204,7 +205,7 @@ $(function() {
 				F._bindTouchEvents();
 			}
 			
-			$(F._currentCollection).first().trigger("fluidboxAfterBind");
+			$(F._instance).triggerHandler("fluidboxAfterBind");
 		},
 		
 		/** Bind CSS3 animation events */
@@ -313,8 +314,9 @@ $(function() {
 		 * Initialize and show Fluidbox overlay
 		 * @constructs
 		 */
-		open: function(collection, options) {
+		open: function(collection, options, instance) {
 			F._currentCollection = collection;
+			F._instance = instance;
 			
 			// Merge options with defaults
 			F._currentOptions = $.extend(true, {}, F.defaults, options);			
@@ -333,7 +335,7 @@ $(function() {
 			// Add overlay
 			F._createOverlay();
 			
-			$(F._currentCollection).first().trigger("fluidboxBeforeOpen");
+			$(F._instance).triggerHandler("fluidboxBeforeOpen");
 			
 			// Show overlay
 			if(F._isAnimated !== false) {
@@ -357,12 +359,12 @@ $(function() {
 				F._preloadCollection();
 			}
 			
-			$(F._currentCollection).first().trigger("fluidboxAfterOpen");
+			$(F._instance).triggerHandler("fluidboxAfterOpen");
 		},
 		
 		/** Close overlay and unbind events */
 		close: function() {
-			$(F._currentCollection).first().trigger("fluidboxBeforeClose");
+			$(F._instance).triggerHandler("fluidboxBeforeClose");
 		
 			// Set closing
 			F._isClosing = true;
@@ -388,7 +390,7 @@ $(function() {
 				
 			F._unbindEvents();
 			
-			$(F._currentCollection).first().trigger("fluidboxAfterClose");
+			$(F._instance).triggerHandler("fluidboxAfterClose");
 		},
 		
 		/** 
@@ -445,7 +447,7 @@ $(function() {
 			
 			// Fade out previous item
 			if(direction !== 'open' && !F._isLoading) {
-				$(F).trigger("fluidboxBeforeHide");
+				$(F._instance).triggerHandler("fluidboxBeforeHide");
 				
 				$(F._outer).removeClass(F._animClasses);
 				$(F._outer).hide();
@@ -470,7 +472,7 @@ $(function() {
 					$(oldOuter).remove();
 				}
 				
-				$(F).trigger("fluidboxAfterHide");
+				$(F._instance).triggerHandler("fluidboxAfterHide");
 			}
 			
 			// Reset title
@@ -487,7 +489,7 @@ $(function() {
 				var eventData = { index: index, target: currentElement, direction: direction, image: this, title: $(currentElement).attr('title'), animation: $.extend(true, {}, F._currentOptions.animation, $(currentElement).data('animation')) };
 				
 				// Trigger callback
-				$(F).trigger("fluidboxBeforeShow", eventData);
+				$(F._instance).triggerHandler("fluidboxBeforeShow", eventData);
 				
 				// Set animation options for current item
 				$(F._outer).data('animation', $.extend(true, {}, F.defaults.animation, eventData.animation));
@@ -523,7 +525,7 @@ $(function() {
 					F.resize();
 				}
 					
-				$(F).trigger("fluidboxAfterShow", eventData);
+				$(F._instance).triggerHandler("fluidboxAfterShow", eventData);
 			};
 			
 			currentImage.src = $(currentElement).attr('href');
@@ -579,10 +581,10 @@ $(function() {
 				options.index = 0;
 			}
 			
-			$.fluidbox.open(collection, options);
+			$.fluidbox.open(collection, options, $(that));
 		});
 		
-		return $($.fluidbox);
+		return $(this);
 	};
 	
 });

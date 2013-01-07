@@ -1,38 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>jQuery Fluidbox Demo</title>
+	<meta charset="utf-8">
+	<title>jQuery Fluidbox Demo</title>
 
-  <!-- Necessary -->
-  <link rel="stylesheet" type="text/css" media="screen" href="../lib/css/animate.min.css">  
-  <script language="javascript" type="text/javascript" src="../lib/js/jquery-1.8.3.min.js"></script>
-  <script language="javascript" type="text/javascript" src="../lib/js/modernizr.custom.min.js"></script>
+	<!-- Necessary -->
+	<link rel="stylesheet" type="text/css" media="screen" href="../lib/css/animate.min.css">  
+	<script language="javascript" type="text/javascript" src="../lib/js/jquery-1.8.3.min.js"></script>
+	<script language="javascript" type="text/javascript" src="../lib/js/modernizr.custom.min.js"></script>
+
+	<!-- Optional -->
+	<script language="javascript" type="text/javascript" src="../lib/js/hammer.min.js"></script> <!-- Touch screen library -->
+
+	<!-- Demo page stuff -->
+	<link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap-responsive.min.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="css/prettify.min.css" />
+	<script language="javascript" type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script language="javascript" type="text/javascript" src="js/prettify.min.js"></script>
+
+	<!-- Fluidbox -->
+	<link rel="stylesheet" type="text/css" media="screen" href="../source/jquery.fluidbox.css" />
+	<script language="javascript" type="text/javascript" src="../source/jquery.fluidbox.js"></script>
+
+	<!--[if lt IE 9]>
+	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
   
-  <!-- Optional -->
-  <script language="javascript" type="text/javascript" src="../lib/js/hammer.min.js"></script> <!-- Touch screen library -->
+	<style type="text/css" media="screen">
+		.thumbnail {
+			margin: 3px 0;
+			max-width: 350px;
+		}
+		
+		pre {
+			-moz-tab-size: 4;
+			-o-tab-size: 4;
+			tab-size: 4;
+		}
+		
+		.popover {
+			width: auto!important;
+		}
+	</style>
   
-  <!-- Demo page stuff -->
-  <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap-responsive.min.css">
-  <script language="javascript" type="text/javascript" src="js/bootstrap.min.js"></script>
-  
-  <!-- Fluidbox -->
-  <link rel="stylesheet" type="text/css" media="screen" href="../source/jquery.fluidbox.css">
-  <script language="javascript" type="text/javascript" src="../source/jquery.fluidbox.js"></script>
-  
-  <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-  
-  <script language="javascript">
-	$(function() {
-		$('ul.nav > li').click(function() {
-			$('.nav-list li').removeClass('active');
-			$(this).addClass('active');
+	<script language="javascript">
+		$(function() {
+			prettyPrint();
+			
+			if($(window).width() > 767) {
+				$('#navigation').parent('.well').affix();
+			}
+		
+			$('#navigation li').click(function() {
+				
+				$('#navigation li').removeClass('active');
+				$(this).addClass('active');
+				
+				$('section').hide();
+				$($(this).children('a').first().attr('href')).parents('section').show();
+			});
+			
+			/* Basic demo */
+			$('.demo-default').fluidbox();
+			
+			/* Disable buttons demo */
+			$('.demo-buttons').fluidbox({
+				templates: {
+					buttons: {
+						close: false,
+						next: false,
+						prev: false
+					}
+				}
+			});
+			
+			/* Title callback demo */
+			$('.demo-title').fluidbox().bind('fluidboxBeforeShow', function(e, a) {
+				a.title += "- isn't it beautiful?";
+			});
+			
+			/* Animation demo */
+			$('.demo-animation').first().data('animation', {
+				next: {
+					in: 'rotateInDownRight',
+					out: 'rotateOutUpLeft'
+				},
+				prev: {
+					in: 'rotateInDownLeft',
+					out: 'rotateOutUpRight'
+				}
+			});
+			
+			$('.demo-animation').fluidbox();
 		});
-	});
-  </script>
+	</script>
 </head>
 <body>
 	<a href="https://github.com/mdeboer/jquery-fluidbox"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
@@ -44,39 +106,375 @@
 		</div>
 		<div class="row">
 			<div class="span3">
-				<div class="well" style="padding: 8px 0">
-				<ul class="nav nav-list">
-					<li class="active"><a href="index.html#">About</a></li>
-					<li class="nav-header">Examples</li>
-					<li><a href="examples.html#single">Single images</a></li>
+				<div class="well" style="padding: 8px 0; width: inherit;">
+				<ul class="nav nav-list" id="navigation">
+					<li class="active"><a href="#about">About</a></li>
+					<li><a href="#options">Options</a></li>
+					<li><a href="#events">Events</a></li>
+					<li class="divider"></li>
+					<li><a href="#getting-started">Getting started</a></li>
+					<li class="nav-header">Basic examples</li>
+					<li><a href="#single">Single images</a></li>
+					<li><a href="#multi">Multiple images</a></li>
+					<li><a href="#buttons">Buttons</a></li>
+					
+					<li class="nav-header">Advanced examples</li>
+					<li><a href="#custom-title">Custom title</a></li>
+					<li><a href="#custom-animation">Custom animations</a></li>
 				</ul>
 				</div>
 			</div>
 			<div class="span9">
+			
 				<!-- About -->
-				<h2>Fluidbox</h2>
-				<p>Fluidbox is a simple, lightweight but modern lightbox plugin written in javascript using jQuery and CSS3. Lightbox plugins are quite commonly used on modern websites to show users an image, multiple images or other content using a modal dialog.</p>
-				<p>Copyright (c) 2012 - 2013 Maarten de Boer - <a href="mailto:info@maartendeboer.net"><code>info@maartendeboer.net</code></a></p>
+				<section id="page-about">
+					<h2 id="about" name="about">Fluidbox</h2>
+					<p>Fluidbox is a simple, lightweight but modern lightbox plugin written in javascript using jQuery and CSS3. Lightbox plugins are quite commonly used on modern websites to show users an image, multiple images or other content using a modal dialog.</p>
+					<p>Copyright (c) 2012 - 2013 Maarten de Boer - <a href="mailto:info@maartendeboer.net"><code>info@maartendeboer.net</code></a></p>
+					
+					<h3>Features</h2>
+					<ul>
+						<li>Easy implementation into your website</li>
+						<li>Smooth transitions using CSS3 using Animate.css</li>
+						<li>Touch screen support using Hammer (optional)</li>
+						<li>Basic support for mobile phones and tablets</li>
+						<li>Support for browsers without animation support!</li>
+						<li>Lot's of customization support</li>
+					</ul>
+					
+					<h3>Coming soon</h3>
+					<ul>
+						<li>Better support for (older) mobile phones and tablets</li>
+					</ul>
+					<p><em>Also, check the <a href="https://github.com/mdeboer/jquery-fluidbox/issues">issues tracker</a> for more coming features or post your own ideas!</em></p>
+				</section>
 				
-				<h3>Features</h2>
-				<ul>
-					<li>Easy implementation into your website</li>
-					<li>Smooth transitions using CSS3 using Animate.css</li>
-					<li>Touch screen support using Hammer (optional)</li>
-					<li>Basic support for mobile phones and tablets</li>
-					<li>Support for browsers without animation support!</li>
-				</ul>
+				<!-- Options -->
+				<section id="page-options" style="display: none;">
+					<h2 id="options" name="options">Options</h2>
+					<p>Fluidbox has quite a few options you can change so here is a nice overview!</p>
+					
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Values</th>
+								<th>Default</th>
+								<th>Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>animation</td>
+								<td><code>false</code>, <code>PlainObject</code></td>
+								<td><code class="option" data-option="animation">PlainObject</code></td>
+								<td>Contains animation name for each action.</td>
+							</tr>
+							<tr>
+								<td>keys</td>
+								<td><code>PlainObject</code></td>
+								<td><code class="option" data-option="keys">PlainObject</code></td>
+								<td>Key codes for navigation actions</td>
+							</tr>
+							<tr>
+								<td>positions</td>
+								<td><code>PlainObject</code></td>
+								<td><code class="option" data-option="positions">PlainObject</code></td>
+								<td>Contains the positions for various Fluidbox elements. Eg. <code>inner</code> relates to <code>#fluidbox-inner</code></td>
+							</tr>
+							<tr>
+								<td>preload</td>
+								<td><code>boolean</code></td>
+								<td><code>true</code></td>
+								<td>True to preload all images in collection instead of loading image when showed.</td>
+							</tr>
+							<tr>
+								<td>resize</td>
+								<td><code>boolean</code></td>
+								<td><code>true</code></td>
+								<td>True to center and resize overlay on window resize.</td>
+							</tr>
+							<tr>
+								<td>templates</td>
+								<td><code>PlainObject</code></td>
+								<td><code class="option" data-option="templates">PlainObject</code></td>
+								<td>Contains html templates of all Fluidbox elements.</td>
+							</tr>
+							<tr>
+								<td>touch</td>
+								<td><code>boolean</code></td>
+								<td><code>true</code></td>
+								<td>True to enable touchscreen support (when available), requires <a href="http://eightmedia.github.com/hammer.js/" target="_blank">Hammer.js</a>.</td>
+							</tr>
+						</tbody>
+					</table>
+					
+					<p class="muted">* For all available animations for use in the <code>animation</code> option, see <a href="http://daneden.me/animate/" target="_blank">http://daneden.me/animate/</a></p>
+					
+					<script type="text/javascript" language="javascript">
+						$('code.option').popover({ 
+							title: 'Contents', 
+							trigger: 'hover',
+							html: true,
+							content: function() {
+								var content = JSON.stringify($.fluidbox.defaults[$(this).data('option')], null, '\t');
+								
+								content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+							
+								return '<pre>' + content + '</pre>';
+							}
+						});
+					</script>
+				</section>
 				
-				<h3>Coming soon</h3>
-				<ul>
-					<li>Better support for (older) mobile phones and tablets</li>
-				</ul>
-				<p><em>Also, check the <a href="https://github.com/mdeboer/jquery-fluidbox/issues">issues tracker</a> for more coming features or post your own ideas!</em></p>
+				<!-- Events -->
+				<section id="page-events" style="display: none;">
+					<h2 id="events" name="events">Events</h2>
+					<p>To allow complete customization, Fluidbox triggers events to which you cand bind your own code to and do whatever you like!<br />See the <em>Advanced Examples</em> section in the menu for examples using these events</p>
+					
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Description</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><code>fluidboxBeforeCreate</code></td>
+								<td>Triggered before overlay and all other Fluidbox elements are created.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxAfterCreate</code></td>
+								<td>Triggered after overlay and all other Fluidbox elements are created.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxBeforeBind</code></td>
+								<td>Triggered before binding default keys and events.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxAfterBind</code></td>
+								<td>Triggered after binding default keys and events.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxBeforeOpen</code></td>
+								<td>Triggered before showing the overlay.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxAfterOpen</code></td>
+								<td>Triggered after elements are created, keys are bound and the overlay is shown.<br /><span class="muted">Note: opening animation might still not be completed when this event is raised</span></td>
+							</tr>
+							<tr>
+								<td><code>fluidboxBeforeShow</code></td>
+								<td>Triggered before the new (next) item is shown.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxAfterShow</code></td>
+								<td>Triggered after the new (next) item is shown.<br /><span class="muted">Note: prev/next animation might still not be completed when this event is raised</span></td>
+							</tr>
+							<tr>
+								<td><code>fluidboxBeforeHide</code></td>
+								<td>Triggered before the previously shown item is about to be cast into oblivion.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxAfterHide</code></td>
+								<td>Triggered after the previously shown item is gone.<br /><span class="muted">Note: prev/next animation might still not be completed when this event is raised</span></td>
+							</tr>
+							<tr>
+								<td><code>fluidboxBeforeClose</code></td>
+								<td>Triggered when the overlay is about to close.</td>
+							</tr>
+							<tr>
+								<td><code>fluidboxAfterClose</code></td>
+								<td>Triggered when the overlay is closed.<br /><span class="muted">Note: closing animation might still not be completed when this event is raised</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+				
+				<!-- About -->
+				<section id="page-getting-started" style="display: none;">
+					<h2 id="getting-started" name="getting-started">Getting started</h2>
+					
+					<p>To get started: include <a href="http://jquery.com/" target="_blank">jQuery</a>, <a href="http://modernizr.com/" target="_blank">Modernizr</a>, <a href="http://eightmedia.github.com/hammer.js/" target="_blank">Hammer</a> (optional) and Fluidbox in the <code>head</code> of your page like this:</p>
+					
+<pre class="prettyprint lang-html linenums">
+&lt;!DOCTYPE html&gt;
+    &lt;html lang="en"&gt;
+    &lt;head&gt;
+        &lt;!-- Necessary --&gt;
+        &lt;script language="javascript" src="js/jquery-1.8.3.min.js"&gt;&lt;/script&gt;
+        &lt;script language="javascript" src="js/modernizr.custom.min.js"&gt;&lt;/script&gt;
+        &lt;link rel="stylesheet" href="css/animate.min.css"&gt;
+        
+        &lt;!-- Optional --&gt;
+        &lt;script language="javascript" src="js/hammer.min.js"&gt;&lt;/script&gt;
+        
+        &lt;!-- Fluidbox --&gt;
+        &lt;script language="javascript" src="js/jquery.fluidbox.js"&gt;&lt;/script&gt;
+        &lt;link rel="stylesheet" href="css/jquery.fluidbox.css"&gt;
+    &lt;/head&gt;
+    ...
+</pre>
+
+				<p>After that, include some images (or links to images) in your document to be used with fluidbox. Give them all a <code>class</code> attribute, for example: 'fluidbox'. Optionally include a <code>rel</code> attribute to group images into a gallery or leave it out to show a single image.</p>
+				
+<pre class="prettyprint lang-html linenums">
+...
+&lt;a href="images/image1_big.jpg" class="fluidbox" rel="sample-gallery" title="Image 1"&gt;&lt;img src="images/image1_thumbnail" /&gt;&lt;/a&gt;
+&lt;a href="images/image2_big.jpg" class="fluidbox" rel="sample-gallery" title="Image 2"&gt;&lt;img src="images/image2_thumbnail" /&gt;&lt;/a&gt;
+...
+</pre>
+<p>or:</p>
+<pre class="prettyprint lang-html linenums">
+...
+&lt;a href="images/image1_big.jpg" class="fluidbox" rel="sample-gallery" title="Image 1"&gt;Link to image 1&lt;/a&gt;
+&lt;a href="images/image2_big.jpg" class="fluidbox" rel="sample-gallery" title="Image 2"&gt;Link to image 2&lt;/a&gt;
+...
+</pre>
+
+				<p>Last thing we need to do is initialize Fluidbox!</p>
+				
+<pre class="prettyprint lang-js linenums">
+$(document).ready(function() {
+	$('.fluidbox').fluidbox();
+});
+</pre>
+				
+				</section>
+			
+				<!-- Basic examples -->
+				<section id="page-basic" style="display: none;">
+					<h2>Examples</h2>
+				
+					<!-- Single images -->
+					<h3 id="single" name="single">Single images</h3>
+					<p>Simple demo demonstrating the use of fluidbox on single images, notice that no previous/next buttons are available. This is done by <em>not</em> giving the <code>&lt;a&gt;</code> element a <code>rel</code> attribute.</p>
+					
+<pre class="prettyprint lang-html linenums">
+&lt;a class="my-images" href="img/1.jpg" title="Image 1"&gt;&lt;img src="img/1_thumb.jpg" /&gt;&lt;/a&gt;
+&lt;a class="my-images" href="img/2.jpg" title="Image 2"&gt;&lt;img src="img/2_thumb.jpg" /&gt;&lt;/a&gt;
+&lt;a class="my-images" href="img/3.jpg" title="Image 3"&gt;&lt;img src="img/3_thumb.jpg" /&gt;&lt;/a&gt;
+&lt;a class="my-images" href="img/4.jpg" title="Image 4"&gt;&lt;img src="img/4_thumb.jpg" /&gt;&lt;/a&gt;</pre>			
+<pre class="prettyprint lang-js linenums">
+$('.my-images').fluidbox();</pre>
+					
+					<span class="span2"><a class="demo-default thumbnail" href="img/1.jpg" title="Image 1"><img src="img/1_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-default thumbnail" href="img/2.jpg" title="Image 2"><img src="img/2_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-default thumbnail" href="img/3.jpg" title="Image 3"><img src="img/3_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-default thumbnail" href="img/4.jpg" title="Image 4"><img src="img/4_thumb.jpg" alt="" width="350" /></a></span>
+					<div class="clearfix" style="margin: 40px 0;"></div>
+					
+					<!-- Multiple images -->
+					<h3 id="multi" name="multi">Multiple images</h3>
+					<p>Simple demo demonstrating the use of fluidbox on multiple images. You can browse through the images by using the previous/next buttons with your mouse, use the left/right arrow keys on your keyboard or if you have a touch device you can swipe with your finger.</p>
+					<p>To let fluidbox know your images belong together give the <code>&lt;a&gt;</code> a <code>rel</code> attribute with a unique name, make sure they are all the same for all images!</p>
+					
+<pre class="prettyprint lang-html linenums">
+&lt;a class="my-images" href="img/1.jpg" rel="gallery-1" title="Image 1"&gt;&lt;img src="img/1_thumb.jpg" /&gt;&lt;/a&gt;
+&lt;a class="my-images" href="img/2.jpg" rel="gallery-1" title="Image 2"&gt;&lt;img src="img/2_thumb.jpg" /&gt;&lt;/a&gt;
+&lt;a class="my-images" href="img/3.jpg" rel="gallery-1" title="Image 3"&gt;&lt;img src="img/3_thumb.jpg" /&gt;&lt;/a&gt;
+&lt;a class="my-images" href="img/4.jpg" rel="gallery-1" title="Image 4"&gt;&lt;img src="img/4_thumb.jpg" /&gt;&lt;/a&gt;</pre>			
+<pre class="prettyprint lang-js linenums">
+$('.my-images').fluidbox();</pre>
+					
+					<span class="span2"><a class="demo-default thumbnail" href="img/1.jpg" rel="demo-gallery-1" title="Image 1"><img src="img/1_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-default thumbnail" href="img/2.jpg" rel="demo-gallery-1" title="Image 2"><img src="img/2_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-default thumbnail" href="img/3.jpg" rel="demo-gallery-1" title="Image 3"><img src="img/3_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-default thumbnail" href="img/4.jpg" rel="demo-gallery-1" title="Image 4"><img src="img/4_thumb.jpg" alt="" width="350" /></a></span>
+					<div class="clearfix" style="margin: 40px 0;"></div>
+					
+					<!-- Buttons -->
+					<h3 id="buttons" name="buttons">Buttons</h3>
+					<p>Disabling buttons is easy, just set the button template to <code>false</code> as demonstrated below. This is only a cosmetic change, you can still navigate through the images using your keyboard or touch device.</p>
+					
+					<p>These button template options contain html, which means you can either change them or set them to <code>false</code> to disable them. If you decide to change them, make sure you keep the <code>ID</code> attribute the same.</p>
+					
+					<p>Default ID's for buttons: next button: <code>#fluidbox-btn-next</code>, previous button: <code>#fluidbox-btn-prev</code>, close button: <code>#fluidbox-btn-close</code></p>
+					
+					<p>If you want to add more buttons or other elements you should modify the <code>inner</code>, <code>outer</code> or <code>overlay</code> template instead, depending on where you want your element to appear.</p>
+						
+<pre class="prettyprint lang-js linenums">
+$('.my-images').fluidbox({
+	templates: {
+		buttons: {
+			close: false,
+			next: false,
+			prev: false
+		}
+	}
+});</pre>
+					
+					<span class="span2"><a class="demo-buttons thumbnail" href="img/1.jpg" rel="demo-gallery-1" title="Image 1"><img src="img/1_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-buttons thumbnail" href="img/2.jpg" rel="demo-gallery-1" title="Image 2"><img src="img/2_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-buttons thumbnail" href="img/3.jpg" rel="demo-gallery-1" title="Image 3"><img src="img/3_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-buttons thumbnail" href="img/4.jpg" rel="demo-gallery-1" title="Image 4"><img src="img/4_thumb.jpg" alt="" width="350" /></a></span>
+					<div class="clearfix" style="margin: 40px 0;"></div>
+					
+				</section>
+				
+				<!-- Advanced examples -->
+				<section id="page-advanced" style="display: none;">
+					<h2>Examples</h2>
+					
+					<!-- Custom title -->
+					<h3 id="custom-title" name="custom-title">Custom title</h3>
+					<p>Titles are assigned to an image by using the <code>title</code> attribute but you can add custom content to an image title by binding to the <code>fluidboxBeforeShow</code> event.</p>
+
+<pre class="prettyprint lang-js linenums">
+$('.my-images').fluidbox().bind('fluidboxBeforeShow', function(event, item) {
+	item.title += "- isn't it beautiful?";
+});</pre>
+					
+					<span class="span2"><a class="demo-title thumbnail" href="img/1.jpg" rel="demo-gallery-1" title="Image 1"><img src="img/1_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-title thumbnail" href="img/2.jpg" rel="demo-gallery-1" title="Image 2"><img src="img/2_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-title thumbnail" href="img/3.jpg" rel="demo-gallery-1" title="Image 3"><img src="img/3_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-title thumbnail" href="img/4.jpg" rel="demo-gallery-1" title="Image 4"><img src="img/4_thumb.jpg" alt="" width="350" /></a></span>
+					<div class="clearfix" style="margin: 40px 0;"></div>
+					
+					<!-- Custom animation -->
+					<h3 id="custom-animation" name="custom-animation">Custom animations</h3>
+					<p>You can specify custom animations per element by setting the <code>animation</code> data attribute. The code below demonstrates this by specifying a custom prev/next animation for the first image.</p>
+					
+					<h6>Method #1 (preferred):</h6>
+<pre class="prettyprint lang-js linenums">
+$('.my-images').first().data('animation', {
+	next: {
+		in: 'rotateInDownRight',
+		out: 'rotateOutUpLeft'
+	},
+	prev: {
+		in: 'rotateInDownLeft',
+		out: 'rotateOutUpRight'
+	}
+});
+$('.my-images').fluidbox();</pre>
+					
+					<h6>Method #2:</h6>
+<pre class="prettyprint lang-js linenums">
+$('.my-images').fluidbox().bind('fluidboxBeforeShow', function(event, item) {
+	if(item.index == 0) {
+		item.animation = {
+			next: {
+				in: 'rotateInDownRight',
+				out: 'rotateOutUpLeft'
+			},
+			prev: {
+				in: 'rotateInDownLeft',
+				out: 'rotateOutUpRight'
+			}
+		};
+	}
+});</pre>
+					
+					<span class="span2"><a class="demo-animation thumbnail" href="img/1.jpg" rel="demo-gallery-1" title="Image 1"><img src="img/1_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-animation thumbnail" href="img/2.jpg" rel="demo-gallery-1" title="Image 2"><img src="img/2_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-animation thumbnail" href="img/3.jpg" rel="demo-gallery-1" title="Image 3"><img src="img/3_thumb.jpg" alt="" width="350" /></a></span>
+					<span class="span2"><a class="demo-animation thumbnail" href="img/4.jpg" rel="demo-gallery-1" title="Image 4"><img src="img/4_thumb.jpg" alt="" width="350" /></a></span>
+					<div class="clearfix" style="margin: 40px 0;"></div>
+				</section>
 			</div>
 		</div>
 	</div>
-
-	
-	
 </body>
 </html>
