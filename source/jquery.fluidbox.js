@@ -101,15 +101,12 @@ $(function() {
 			// Outer (containing inner)
 			if($('#fluidbox-outer').length === 0) {
 				$('body').append(F._currentOptions.templates.outer);
-				$('#fluidbox-outer').append(F._currentOptions.templates.inner);
+				$('#fluidbox-outer').html(F._currentOptions.templates.inner);
 			}
 			
 			// Overlay
 			if($('#fluidbox-overlay').length === 0) {
 				$('body').append(F._currentOptions.templates.overlay);
-				$('#fluidbox-overlay').click(function() {
-					F.close();
-				});
 			}
 			
 			// Loading
@@ -123,25 +120,16 @@ $(function() {
 			}
 			
 			// Navigation buttons
-			if(F._currentOptions.positions.buttons.close !== false) {
+			if(F._currentOptions.positions.buttons.close !== false && $('#fluidbox-loading').length === 0) {
 				$('#fluidbox-'+ F._currentOptions.positions.buttons.close).append(F._currentOptions.templates.buttons.close);
-				$('#fluidbox-btn-close').click(function() {
-					F.close();
-				});				
 			}
 			
 			if(F._currentCollection.length > 1) {
-				if(F._currentOptions.positions.buttons.next !== false) {
+				if(F._currentOptions.positions.buttons.next !== false && $('#fluidbox-btn-next').length === 0) {
 					$('#fluidbox-'+ F._currentOptions.positions.buttons.next).append(F._currentOptions.templates.buttons.next);
-					$('#fluidbox-btn-next').click(function() {
-						F.next();
-					});
 				}	
-				if(F._currentOptions.positions.buttons.prev !== false) {
+				if(F._currentOptions.positions.buttons.prev !== false && $('#fluidbox-btn-prev').length === 0) {
 					$('#fluidbox-'+ F._currentOptions.positions.buttons.prev).append(F._currentOptions.templates.buttons.prev);
-					$('#fluidbox-btn-prev').click(function() {
-						F.prev();
-					});
 				}
 			}
 			
@@ -158,21 +146,21 @@ $(function() {
 		/** Clean up bound events */
 		_unbindEvents: function() {
 			// Unbind window events
-			$(window).unbind('keydown.fluidbox');
+			$(document).unbind('keydown.fluidbox');
 			$(window).unbind('resize.fluidbox');
 			
 			// Unbind overlay
-			F._overlay.unbind('click');
+			$('#fluidbox-overlay').unbind('click');
 			
 			// Unbind navigation buttons
-			$(F._currentOptions.templates.buttons.close).unbind('click');
-			$(F._currentOptions.templates.buttons.next).unbind('click');
-			$(F._currentOptions.templates.buttons.prev).unbind('click');
+			$('#fluidbox-btn-close').unbind('click');
+			$('#fluidbox-btn-next').unbind('click');
+			$('#fluidbox-btn-prev').unbind('click');
 			
 			// Touch events
 			if(F._isTouch) {
-				$(F._outer).unbind('swipe');
-				$(F._outer).unbind('dragstart');
+				$('#fluidbox-outer').unbind('swipe');
+				$('#fluidbox-outer').unbind('dragstart');
 			}
 		},
 		
@@ -181,20 +169,28 @@ $(function() {
 			$(F._instance).triggerHandler("fluidboxBeforeBind");
 		
 			// Key events
-			$(window).bind('keydown.fluidbox', function(e) {
+			$(document).bind('keydown.fluidbox', function(e) {			
 				if (!e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
-					if ($.inArray(e.keyCode, F._currentOptions.keys.close) > -1) {
+					if ($.inArray(e.which, F._currentOptions.keys.close) > -1) {
 						F.close();
 						e.preventDefault();
-					} else if (F._currentCollection.length > 1 && $.inArray(e.keyCode, F._currentOptions.keys.next) > -1) {
+					} else if (F._currentCollection.length > 1 && $.inArray(e.which, F._currentOptions.keys.next) > -1) {
 						F.next();
 						e.preventDefault();
-					} else if (F._currentCollection.length > 1 && $.inArray(e.keyCode, F._currentOptions.keys.prev) > -1) {
+					} else if (F._currentCollection.length > 1 && $.inArray(e.which, F._currentOptions.keys.prev) > -1) {
 						F.prev();
 						e.preventDefault();
 					}
 				}
 			});
+			
+			// Overlay
+			$('#fluidbox-overlay').click(function() { F.close(); });
+			
+			// Buttons
+			$('#fluidbox-btn-close').click(function() { F.close(); });
+			$('#fluidbox-btn-next').click(function() { F.next(); });
+			$('#fluidbox-btn-prev').click(function() { F.prev(); });
 
 			// Smart resize
 			if(F._currentOptions.resize) {
@@ -235,8 +231,10 @@ $(function() {
 				if($(e.target).is(F._overlay)) {				
 					if(F._isClosing) {						
 						F._overlay.remove();
+						F._inner.remove();
 						F._outer.remove();
 						F._loading.remove();
+						
 						$('body').css({ overflow: '' });
 						
 						$(document).unbind(F._transEndEventNames[Modernizr.prefixed('animation')]);
@@ -356,15 +354,14 @@ $(function() {
 			}
 			
 			// Save current scroll position (firefox 'unwanted feature')
-			var scrollX = $('body').scrollLeft(),
-				scrollY = $('body').scrollTop();
-			
+			var scrollX = document.body.scrollLeft + document.documentElement.scrollLeft,
+				scrollY = document.body.scrollTop + document.documentElement.scrollTop;
+				
 			// Disable overflow on HTML
 			$('body').css({ overflow: 'hidden' });
 			
 			// Restore scroll position
-			$('body').scrollLeft(scrollX);
-			$('body').scrollTop(scrollY);			
+			window.scrollTo(scrollX, scrollY);	
 			
 			// Show image
 			F.show(F._currentIndex, 'open');
@@ -404,6 +401,7 @@ $(function() {
 			}
 			else {
 				F._showLoading(false);
+				F._outer.hide();
 			}
 				
 			F._unbindEvents();
