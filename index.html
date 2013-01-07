@@ -42,15 +42,21 @@
 		.popover {
 			width: auto!important;
 		}
+		
+		@media (max-width: 767px) {
+			#navigation-well {
+				position: static;
+				width: auto;
+				top: 0;
+			}
+		}
 	</style>
   
 	<script language="javascript">
 		$(function() {
 			prettyPrint();
 			
-			if($(window).width() > 767) {
-				$('#navigation').parent('.well').affix();
-			}
+			$('#navigation-well').affix();
 		
 			$('#navigation li:not(.divider, .nav-header)').click(function() {
 				
@@ -106,7 +112,7 @@
 		</div>
 		<div class="row">
 			<div class="span3">
-				<div class="well" style="padding: 8px 0; width: inherit;">
+				<div class="well" style="padding: 8px 0; width: inherit;" id="navigation-well">
 				<ul class="nav nav-list" id="navigation">
 					<li class="active"><a href="#about">About</a></li>
 					<li><a href="#options">Options</a></li>
