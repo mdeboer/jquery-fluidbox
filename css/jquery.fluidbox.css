@@ -10,9 +10,9 @@
 	overflow: hidden;
 }
 
-#fluidbox-outer, #fluidbox-outer-ghost {
+#fluidbox-outer, .fluidbox-outer-ghost {
 	display: none;
-	position: absolute;
+	position: fixed;
 	top: 50%;
 	left: 50%;
 	padding: 0px;
@@ -43,13 +43,13 @@
 	display: block;
 	width: 48px;
 	height: 48px;
-	position: absolute;
+	position: fixed;
 	top: 50%;
 	left: 50%;
 	margin-left: -24px;
 	margin-top: -24px;
 	z-index: 8005;
-	background: url(../images/loading.gif);
+	background: url(../img/loading.gif);
 }
 
 #fluidbox-title {
@@ -72,7 +72,7 @@
 
 /** Buttons */
 #fluidbox-btn-close {
-	background-image: url(../images/close.png);
+	background-image: url(../img/close.png);
 	width: 48px;
 	height: 48px;
 	position: absolute;
@@ -88,7 +88,7 @@
 	top: 0;
 	right: -1px;
 	cursor: pointer;
-	background: url(../images/next.png) top left repeat-y;
+	background: url(../img/next.png) top left repeat-y;
 	opacity: 0;
 }
 #fluidbox-btn-next:hover {
@@ -102,7 +102,7 @@
 	top: 0;
 	left: -1px;
 	cursor: pointer;
-	background: url(../images/prev.png) top left repeat-y;
+	background: url(../img/prev.png) top left repeat-y;
 	opacity: 0;
 }
 #fluidbox-btn-prev:hover {
