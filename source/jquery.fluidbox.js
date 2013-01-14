@@ -590,7 +590,7 @@ $(function() {
 			
 			// Filter current collection on "rel" attribute
 			if($(this).attr('rel')) {
-				collection = that.filter('[rel='+ $(this).attr('rel') +']');
+				collection = that.filter('[rel="'+ $(this).attr('rel') +'"]');
 				// Set opening index
 				options.index = collection.index(this);
 			} else {
