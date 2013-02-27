@@ -28,11 +28,15 @@ $(function() {
 		_isLoading: false,
 		_isOpening: false,
 		_isClosing: false,
-		_isTouch: false,
 		_isAnimated: false,
+		
+		/** Support libs */
+		_hasModernizr: false,
+		_hasHammer: false,
 		
 		/** Quick access variables for layout */
 		_overlay: {},
+		_viewport: {},
 		_outer: {},
 		_inner: {},
 		_loading: {},
@@ -42,19 +46,15 @@ $(function() {
 		_animClasses: "animated flash bounce shake tada swing wobble wiggle pulse flip flipInX flipOutX flipInY flipOutY fadeIn fadeInUp fadeInDown fadeInLeft fadeInRight fadeInUpBig fadeInDownBig fadeInLeftBig fadeInRightBig fadeOut fadeOutUp fadeOutDown fadeOutLeft fadeOutRight fadeOutUpBig fadeOutDownBig fadeOutLeftBig fadeOutRightBig bounceIn bounceInDown bounceInUp bounceInLeft bounceInRight bounceOut bounceOutDown bounceOutUp bounceOutLeft bounceOutRight rotateIn rotateInDownLeft rotateInDownRight rotateInUpLeft rotateInUpRight rotateOut rotateOutDownLeft rotateOutDownRight rotateOutUpLeft rotateOutUpRight lightSpeedIn lightSpeedOut hinge rollIn rollOut",
 		
 		/** Animation end events */
-		_transEndEventNames: {
-			'WebkitAnimation' : 'webkitAnimationEnd',
-			'MozAnimation'    : 'animationend',
-			'OAnimation'      : 'oanimationend',
-			'msAnimation'     : 'MSAnimationEnd',
-			'animation'       : 'animationend'
-		},
+		_transEndEventNames: 'webkitAnimationEnd animationend oanimationend MSAnimationEnd',
 		
 		/** Default options */
 		defaults: {
 			resize: true,
 			preload: true,
 			touch: true,
+			animated: true,
+			padding: 50,
 			templates: {
 				inner: '<div id="fluidbox-inner"></div>',
 				outer: '<div id="fluidbox-outer"></div>',
@@ -80,7 +80,7 @@ $(function() {
 				prev: [37, 38],
 				close: [27]
 			},
-			animation: {
+			animations: {
 				open: 'fadeIn',
 				close: 'fadeOut',
 				next: {
@@ -217,7 +217,7 @@ $(function() {
 			}
 		
 			// Animation completed event
-			$(document).bind(F._transEndEventNames[Modernizr.prefixed('animation')], function(e) {
+			$(document).bind(F._transEndEventNames, function(e) {
 				$(e.target).removeClass(F._animClasses).removeClass('opening closing');
 				
 				// Loading
@@ -237,7 +237,7 @@ $(function() {
 						
 						$('body').css({ overflow: '' });
 						
-						$(document).unbind(F._transEndEventNames[Modernizr.prefixed('animation')]);
+						$(document).unbind(F._transEndEventNames);
 					}
 				}
 				
@@ -334,11 +334,23 @@ $(function() {
 			F._isOpening = true;
 			F._isClosing = false;
 			
+			// Check support libs
+			F._hasHammer = typeof Hammer === 'function';
+			F._hasModernizr = typeof Modernizr === 'function';
+			
 			// Check touch support and option
-			F._isTouch = typeof Hammer === 'function' && Modernizr.touch && F._currentOptions.touch;
+			F._isTouch = F._currentOptions.touch;
+			if(F._isTouch && (!F._hasHammer || (F._hasModernizr && !Modernizr.touch))) {
+				F._isTouch = false;
+				console.log('Touch support not detected or not available (missing hammer.js?), touch disabled.')
+			}
 			
 			// Check animation support
-			F._isAnimated = F._currentOptions.animation !== false && Modernizr.csstransitions;
+			F._isAnimated = F._currentOptions.animated;
+			if(F._isAnimated && F._hasModernizr && !Modernizr.csstransitions) {
+				F._isAnimated = false;
+				console.log('CSS3 transition support not detected or not available, animations disabled.');
+			}
 			
 			// Add overlay
 			F._createOverlay();
@@ -502,13 +514,13 @@ $(function() {
 			currentImage.onload = function() {
 				
 				// Set current image data
-				var eventData = { index: index, target: currentElement, direction: direction, image: this, title: $(currentElement).attr('title'), animation: $.extend(true, {}, F._currentOptions.animation, $(currentElement).data('animation')) };
+				var eventData = { index: index, target: currentElement, direction: direction, image: this, title: $(currentElement).attr('title'), animation: $.extend(true, {}, F._currentOptions.animations, $(currentElement).data('animation')) };
 				
 				// Trigger callback
 				$(F._instance).triggerHandler("fluidboxBeforeShow", eventData);
 				
 				// Set animation options for current item
-				$(F._outer).data('animation', $.extend(true, {}, F.defaults.animation, eventData.animation));
+				$(F._outer).data('animation', $.extend(true, {}, F.defaults.animations, eventData.animation));
 				
 				// Replace image and animate
 				F._inner.append('<img src="'+$(currentElement).attr('href')+'" width="'+this.width+'" height="'+this.height+'" />');
@@ -552,28 +564,31 @@ $(function() {
 		
 		/** Resize the overlay */
 		resize: function() {
-			var origWidth, origHeight,
-				winWidth, winHeight,
-				iRatio;
+			var origWidth = 0, origHeight = 0,
+				winWidth = 0, winHeight = 0,
+				newWidth = 0, newHeight = 0,
+				iRatio = 0;
 		
 			origWidth = $(F._inner).children('img').attr('width');
 			origHeight = $(F._inner).children('img').attr('height');
 			
-			winWidth = $(window).width();
-			winHeight = $(window).height() - (F._outer.height() - F._inner.height());
+			winWidth = $(window).width() - F._currentOptions.padding;
+			winHeight = $(window).height() - F._currentOptions.padding;
 			
 			if(origWidth > winWidth || origHeight > winHeight) {
 				iRatio = Math.min(winWidth / origWidth, winHeight / origHeight);
+				newWidth = (origWidth * iRatio);
+				newHeight = (origHeight * iRatio);
 				F._outer.css({
-					'width': F._outer.width(origWidth * iRatio),
-					'margin-left': '-' + (origWidth * iRatio) / 2 + 'px',
-					'margin-top': '-' + F._outer.height() / 2 + 'px'
+					'width': newWidth,
+					'left': (F._currentOptions.padding / 2) + ((winWidth - newWidth) / 2),
+					'top': (F._currentOptions.padding / 2) + ((winHeight - newHeight) / 2)
 				});
 			} else {
 				F._outer.css({
 					'width': origWidth,
-					'margin-left': '-' + origWidth / 2 + 'px',
-					'margin-top': '-' + origHeight / 2 + 'px'
+					'left': (winWidth - origWidth) / 2,
+					'top': (winHeight - origHeight) / 2
 				});
 			}
 		}
