@@ -105,6 +105,10 @@
 	cursor: pointer;
 }
 
+.touch #fluidbox-btn-next, .touch #fluidbox-btn-prev {
+	display: none;
+}
+
 #fluidbox-btn-next {
 	width: 150px;
 	height: 100%;

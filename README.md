@@ -9,14 +9,11 @@ Copyright (c) 2012 - 2013 Maarten de Boer - <info@maartendeboer.net>
 
 ## Features
 * Easy implementation into your website
-* Smooth transitions using CSS3 using Animate.css
-* Touch screen support using Hammer (optional)
-* Basic support for mobile phones and tablets
-* Support for browsers without animation support!
+* Smooth transitions with CSS3 using Animate.css
+* Touch screen support with multi-touch gestures using Hammer (optional)
+* Support for mobile phones and tablets
+* Works in browsers without CSS3 animation support!
 * Lot's of customization support
-
-### Coming soon
-* Better support for (older) mobile phones and tablets
 
 *Also, check the issues tracker for more coming features or post your own ideas!*
 
@@ -29,10 +26,10 @@ To get started: include jQuery, Modernizr, Hammer (optional) and Fluidbox in the
     <head>
         <!-- Necessary -->
         <script language="javascript" src="js/jquery-1.8.3.min.js"></script>
-        <script language="javascript" src="js/modernizr.custom.min.js"></script>
         <link rel="stylesheet" href="css/animate.min.css">
         
         <!-- Optional -->
+		<script language="javascript" src="js/modernizr.custom.min.js"></script>
         <script language="javascript" src="js/hammer.min.js"></script>
         
         <!-- Fluidbox -->
