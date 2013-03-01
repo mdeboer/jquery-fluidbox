@@ -161,20 +161,6 @@ $(function() {
 			$('#fluidbox-btn-close').unbind('click');
 			$('#fluidbox-btn-next').unbind('click');
 			$('#fluidbox-btn-prev').unbind('click');
-			
-			// Touch events
-			if(F._isTouch) {
-				$(document).off('touchmove');
-			
-				F._outer.off('swipe');
-				F._outer.off('dragstart');
-				F._outer.off('drag');
-				F._outer.off('dragend');
-				F._outer.off('transformstart');
-				F._outer.off('transform');
-				F._outer.off('transformend');
-				F._outer.off('doubletap');
-			}
 		},
 		
 		/** Bind events */
@@ -282,7 +268,7 @@ $(function() {
 		},
 		
 		/** Bind touch events */
-		_bindTouchEvents: function() {
+		_bindTouchEvents: function() {		
 			F._outer.hammer({
 				drag: true,
 				transform: true,
@@ -292,20 +278,20 @@ $(function() {
 			});
 			
 			// Disable page scrolling
-			$(document).on('touchmove', function(e) {
+			$(document).bind('touchmove', function(e) {
 				if($(F._outer).find(e.target).length === 0) {
 					e.preventDefault();
 				}
 			});
 			
 			// Drag
-			F._outer.on('dragstart', function(e) {
+			F._outer.bind('dragstart', function(e) {
 				e.preventDefault();
 				F._outer.data('currentX', parseInt(F._outer.css('left'), 10));
 				F._outer.data('currentY', parseInt(F._outer.css('top'), 10));
 			});
 			
-			F._outer.on('drag', function(e) {				
+			F._outer.bind('drag', function(e) {				
 				if(F._isDraggable) {
 					e.preventDefault();
 					
@@ -316,20 +302,20 @@ $(function() {
 				}
 			});
 			
-			F._outer.on('dragend', function(e) {
+			F._outer.bind('dragend', function(e) {
 				e.preventDefault();
 				F._outer.removeData('currentX');
 				F._outer.removeData('currentY');
 			});
 			
 			// Double tap (return to normal size)
-			F._outer.on('doubletap', function(e) {
+			F._outer.bind('doubletap', function(e) {
 				F._isDraggable = !F._isDraggable;
 				F.resize();
 			});
 			
 			// Transform (pinch zoom)
-			F._outer.on('transformstart', function(e) {
+			F._outer.bind('transformstart', function(e) {
 				F._outer.data('currentX', parseInt(F._outer.css('left'), 10));
 				F._outer.data('currentY', parseInt(F._outer.css('top'), 10));
 				F._outer.data('currentWidth', F._outer.width());
@@ -337,26 +323,28 @@ $(function() {
 				F._isDraggable = true;
 			});
 			
-			F._outer.on('transform', function(e) {		
-				console.log(e);
+			F._outer.bind('transform', function(e) {		
+				
 				var newWidth = F._outer.data('currentWidth') * e.gesture.scale,
 					newHeight = F._outer.data('currentHeight') * e.gesture.scale;
-					
+				
 				F._outer.css({
 					'width': newWidth,
 					'left': F._outer.data('currentX') + ((F._outer.data('currentWidth') - newWidth) / 2),
 					'top': F._outer.data('currentY') + ((F._outer.data('currentHeight') - newHeight) / 2)
 				});
+				
+				
 			});
 			
-			F._outer.on('transformend', function(e) {
+			F._outer.bind('transformend', function(e) {
 				F._outer.removeData('currentWidth');
 				F._outer.removeData('currentX');
 				F._outer.removeData('currentY');
 			});
 			
 			// Swipe
-			F._outer.on('swipe', function(e) {				
+			F._outer.bind('swipe', function(e) {				
 				if(!F._isDraggable) {
 					
 					if(e.gesture.direction === "left") {
