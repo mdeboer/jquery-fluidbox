@@ -59,7 +59,7 @@
 	margin-left: -24px;
 	margin-top: -24px;
 	z-index: 8005;
-	background: url(img/loading.gif);
+	background: url(../img/loading.gif);
 }
 
 #fluidbox-title {
