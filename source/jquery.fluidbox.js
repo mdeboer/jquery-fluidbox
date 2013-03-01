@@ -29,6 +29,7 @@ $(function() {
 		_isOpening: false,
 		_isClosing: false,
 		_isAnimated: false,
+		_isDraggable: false,
 		
 		/** Support libs */
 		_hasModernizr: false,
@@ -99,7 +100,7 @@ $(function() {
 			$(F._instance).triggerHandler("fluidboxBeforeCreate");
 		
 			// Outer (containing inner)
-			if($('#fluidbox-outer').length === 0) {
+			if($('#fluidbox-outer').length === 0) {				
 				$('body').append(F._currentOptions.templates.outer);
 				$('#fluidbox-outer').html(F._currentOptions.templates.inner);
 			}
@@ -140,6 +141,11 @@ $(function() {
 			F._loading = $('#fluidbox-loading');
 			F._title = $('#fluidbox-title');
 			
+			// Set helper CSS classes
+			if(F._isTouch) {
+				F._outer.addClass('touch');
+			}
+			
 			$(F._instance).triggerHandler("fluidboxAfterCreate");
 		},
 		
@@ -150,7 +156,7 @@ $(function() {
 			$(window).unbind('resize.fluidbox');
 			
 			// Unbind overlay
-			$('#fluidbox-overlay').unbind('click');
+			F._overlay.unbind('click');
 			
 			// Unbind navigation buttons
 			$('#fluidbox-btn-close').unbind('click');
@@ -159,8 +165,14 @@ $(function() {
 			
 			// Touch events
 			if(F._isTouch) {
-				$('#fluidbox-outer').unbind('swipe');
-				$('#fluidbox-outer').unbind('dragstart');
+				F._outer.off('swipe');
+				F._outer.off('dragstart');
+				F._outer.off('drag');
+				F._outer.off('dragend');
+				F._outer.off('transformstart');
+				F._outer.off('transform');
+				F._outer.off('transformend');
+				F._outer.off('doubletap');
 			}
 		},
 		
@@ -185,12 +197,25 @@ $(function() {
 			});
 			
 			// Overlay
-			$('#fluidbox-overlay').click(function() { F.close(); });
+			F._overlay.click(function() { F.close(); });
 			
 			// Buttons
 			$('#fluidbox-btn-close').click(function() { F.close(); });
 			$('#fluidbox-btn-next').click(function() { F.next(); });
 			$('#fluidbox-btn-prev').click(function() { F.prev(); });
+			
+			// Scale to full-size and enable dragging
+			if(!F._isTouch) {
+				F._outer.dblclick(function() {				
+					if(F._isDraggable == true) {
+						F._isDraggable = false;
+					} else {
+						F._isDraggable = true;
+					}
+					
+					F.resize();
+				});
+			}
 
 			// Smart resize
 			if(F._currentOptions.resize) {
@@ -258,24 +283,81 @@ $(function() {
 		/** Bind touch events */
 		_bindTouchEvents: function() {
 			F._outer.hammer({
-				drag: false,
-				transform: false,
+				drag: true,
+				transform: true,
 				swipe: true,
-				tap: false,
-				hold: false
+				tap: true,
+				hold: false,
 			});
 			
-			F._outer.bind('dragstart', function() {
-				return false;
-			});
-			
-			F._outer.bind('swipe', function(e) {
+			// Drag
+			F._outer.on('dragstart', function(e) {
 				e.preventDefault();
-				if(e.direction === "left") {
-					F.next();
+				F._outer.data('currentX', parseInt(F._outer.css('left'), 10));
+				F._outer.data('currentY', parseInt(F._outer.css('top'), 10));
+			});
+			
+			F._outer.on('drag', function(e) {				
+				if(F._isDraggable) {
+					e.preventDefault();
+					
+					F._outer.css({
+						'left': F._outer.data('currentX') + e.gesture.deltaX,
+						'top':  F._outer.data('currentY') + e.gesture.deltaY
+					});
 				}
-				else if(e.direction === "right") {
-					F.prev();
+			});
+			
+			F._outer.on('dragend', function(e) {
+				e.preventDefault();
+				F._outer.removeData('currentX');
+				F._outer.removeData('currentY');
+			});
+			
+			// Double tap (return to normal size)
+			F._outer.bind('doubletap', function(e) {
+				if(F._isDraggable) {
+					F._isDraggable = false;
+					F.resize();
+				}
+			});
+			
+			// Transform (pinch zoom)
+			F._outer.on('transformstart', function(e) {
+				F._outer.data('currentX', parseInt(F._outer.css('left'), 10));
+				F._outer.data('currentY', parseInt(F._outer.css('top'), 10));
+				F._outer.data('currentWidth', F._outer.width());
+				F._outer.data('currentHeight', F._outer.height());				
+				F._isDraggable = true;
+			});
+			
+			F._outer.on('transform', function(e) {				
+				var newWidth = F._outer.data('currentWidth') * e.gesture.scale,
+					newHeight = F._outer.data('currentHeight') * e.gesture.scale;
+					
+				F._outer.css({
+					'width': newWidth,
+					'left': F._outer.data('currentX') + ((F._outer.data('currentWidth') - newWidth) / 2),
+					'top': F._outer.data('currentY') + ((F._outer.data('currentHeight') - newHeight) / 2)
+				});
+			});
+			
+			F._outer.on('transformend', function(e) {
+				F._outer.removeData('currentWidth');
+				F._outer.removeData('currentX');
+				F._outer.removeData('currentY');
+			});
+			
+			// Swipe
+			F._outer.on('swipe', function(e) {				
+				if(!F._isDraggable) {
+					
+					if(e.gesture.direction === "left") {
+						F.next();
+					}
+					else if(e.gesture.direction === "right") {
+						F.prev();
+					}
 				}
 			});
 		},
@@ -302,7 +384,7 @@ $(function() {
 			} else {
 				if(F._isAnimated !== false) {
 					F._loading.removeClass(F._animClasses).addClass('animated fadeOut');
-					// Hide triggered on callback
+					// Hide is triggered on callback
 				} else {
 					F._loading.hide();
 				}				
@@ -396,6 +478,9 @@ $(function() {
 			// Set closing
 			F._isClosing = true;
 			
+			// Unset draggable
+			F._isDraggable = false;
+			
 			// Animate overlay and loading image
 			if(F._isAnimated !== false) {
 				F._overlay.removeClass(F._animClasses).addClass('animated fadeOut closing');
@@ -426,7 +511,7 @@ $(function() {
 		 * @param string animDirection Animation direction (up | down | left | right)
 		 */
 		next: function() {
-			if(F._currentCollection.length <= 1) {
+			if(F._currentCollection.length <= 1 || F._isDraggable) {
 				return;
 			}
 				
@@ -438,7 +523,7 @@ $(function() {
 		 * @param string animDirection Animation direction (up | down | left | right)
 		 */
 		prev: function() {
-			if(F._currentCollection.length <= 1) {
+			if(F._currentCollection.length <= 1 || F._isDraggable) {
 				return;
 			}
 			
@@ -566,23 +651,27 @@ $(function() {
 		resize: function() {
 			var origWidth = 0, origHeight = 0,
 				winWidth = 0, winHeight = 0,
+				vpWidth = 0, vpHeight = 0,
 				newWidth = 0, newHeight = 0,
 				iRatio = 0;
 		
 			origWidth = $(F._inner).children('img').attr('width');
 			origHeight = $(F._inner).children('img').attr('height');
 			
-			winWidth = $(window).width() - F._currentOptions.padding;
-			winHeight = $(window).height() - F._currentOptions.padding;
+			winWidth = $(window).width();
+			winHeight = $(window).height();
 			
-			if(origWidth > winWidth || origHeight > winHeight) {
-				iRatio = Math.min(winWidth / origWidth, winHeight / origHeight);
+			vpWidth = winWidth - F._currentOptions.padding;
+			vpHeight = winHeight - F._currentOptions.padding
+			
+			if((origWidth > vpWidth || origHeight > vpHeight) && !F._isDraggable) {
+				iRatio = Math.min(vpWidth / origWidth, vpHeight / origHeight);
 				newWidth = (origWidth * iRatio);
 				newHeight = (origHeight * iRatio);
 				F._outer.css({
 					'width': newWidth,
-					'left': (F._currentOptions.padding / 2) + ((winWidth - newWidth) / 2),
-					'top': (F._currentOptions.padding / 2) + ((winHeight - newHeight) / 2)
+					'left': (F._currentOptions.padding / 2) + ((vpWidth - newWidth) / 2),
+					'top': (F._currentOptions.padding / 2) + ((vpHeight - newHeight) / 2)
 				});
 			} else {
 				F._outer.css({
