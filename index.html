@@ -6,10 +6,10 @@
 
 	<!-- Necessary -->
 	<link rel="stylesheet" type="text/css" media="screen" href="css/animate.min.css">  
-	<script language="javascript" type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
-	<script language="javascript" type="text/javascript" src="js/modernizr.custom.min.js"></script>
+	<script language="javascript" type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
 
 	<!-- Optional -->
+	<script language="javascript" type="text/javascript" src="js/modernizr.custom.min.js"></script>
 	<script language="javascript" type="text/javascript" src="js/hammer.min.js"></script> <!-- Touch screen library -->
 
 	<!-- Demo page stuff -->
@@ -42,21 +42,15 @@
 		.popover {
 			width: auto!important;
 		}
-		
-		@media (max-width: 767px) {
-			#navigation-well {
-				position: static;
-				width: auto;
-				top: 0;
-			}
-		}
 	</style>
   
 	<script language="javascript">
 		$(function() {
 			prettyPrint();
 			
-			$('#navigation-well').affix();
+			if($(window).width() > 767) {
+				$('#navigation').parent('.well').affix();
+			}
 		
 			$('#navigation li:not(.divider, .nav-header)').click(function() {
 				
@@ -112,7 +106,7 @@
 		</div>
 		<div class="row">
 			<div class="span3">
-				<div class="well" style="padding: 8px 0; width: inherit;" id="navigation-well">
+				<div class="well" style="padding: 8px 0; width: inherit;">
 				<ul class="nav nav-list" id="navigation">
 					<li class="active"><a href="#about">About</a></li>
 					<li><a href="#options">Options</a></li>
@@ -171,7 +165,13 @@
 						</thead>
 						<tbody>
 							<tr>
-								<td>animation</td>
+								<td>animated</td>
+								<td><code>boolean</code></td>
+								<td><code class="option" data-option="animation">true</code></td>
+								<td>True to use animations if available, false to disable animations.</td>
+							</tr>
+							<tr>
+								<td>animations</td>
 								<td><code>false</code>, <code>PlainObject</code></td>
 								<td><code class="option" data-option="animation">PlainObject</code></td>
 								<td>Contains animation name for each action.</td>
@@ -181,6 +181,12 @@
 								<td><code>PlainObject</code></td>
 								<td><code class="option" data-option="keys">PlainObject</code></td>
 								<td>Key codes for navigation actions</td>
+							</tr>
+							<tr>
+								<td>padding</td>
+								<td><code>integer</code></td>
+								<td><code class="option" data-option="animation">50</code></td>
+								<td>Padding between the window borders and the image in pixels.</td>
 							</tr>
 							<tr>
 								<td>positions</td>
