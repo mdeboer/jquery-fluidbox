@@ -164,6 +164,8 @@ $(function() {
 			
 			// Touch events
 			if(F._isTouch) {
+				$(document).off('touchmove');
+			
 				F._outer.off('swipe');
 				F._outer.off('dragstart');
 				F._outer.off('drag');
@@ -287,6 +289,13 @@ $(function() {
 				swipe: true,
 				tap: true,
 				hold: false
+			});
+			
+			// Disable page scrolling
+			$(document).on('touchmove', function(e) {
+				if($(F._outer).find(e.target).length === 0) {
+					e.preventDefault();
+				}
 			});
 			
 			// Drag
