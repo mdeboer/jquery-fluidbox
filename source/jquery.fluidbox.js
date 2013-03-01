@@ -1,8 +1,7 @@
 /*!
  * fluidBox - jQuery Plugin
  * version: 1.0
- * @requires jQuery v1.6 or later
- * @requires Modernizr v2.5 or later
+ * @requires jQuery v1.8 or later
  *
  * Copyright (c) 2012 - 2013 Maarten de Boer - info@maartendeboer.net
  *
@@ -315,11 +314,9 @@ $(function() {
 			});
 			
 			// Double tap (return to normal size)
-			F._outer.bind('doubletap', function(e) {
-				if(F._isDraggable) {
-					F._isDraggable = false;
-					F.resize();
-				}
+			F._outer.on('doubletap', function(e) {
+				F._isDraggable = !F._isDraggable;
+				F.resize();
 			});
 			
 			// Transform (pinch zoom)
@@ -331,7 +328,8 @@ $(function() {
 				F._isDraggable = true;
 			});
 			
-			F._outer.on('transform', function(e) {				
+			F._outer.on('transform', function(e) {		
+				console.log(e);
 				var newWidth = F._outer.data('currentWidth') * e.gesture.scale,
 					newHeight = F._outer.data('currentHeight') * e.gesture.scale;
 					
