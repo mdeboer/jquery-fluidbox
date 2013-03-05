@@ -324,17 +324,14 @@ $(function() {
 			});
 			
 			F._outer.bind('transform', function(e) {		
-				
 				var newWidth = F._outer.data('currentWidth') * e.gesture.scale,
 					newHeight = F._outer.data('currentHeight') * e.gesture.scale;
 				
 				F._outer.css({
 					'width': newWidth,
-					'left': F._outer.data('currentX') + ((F._outer.data('currentWidth') - newWidth) / 2),
-					'top': F._outer.data('currentY') + ((F._outer.data('currentHeight') - newHeight) / 2)
+					'left': F._outer.data('currentX') + ((F._outer.data('currentWidth') - newWidth) / 2) + e.gesture.deltaX,
+					'top': F._outer.data('currentY') + ((F._outer.data('currentHeight') - newHeight) / 2) + e.gesture.deltaY
 				});
-				
-				
 			});
 			
 			F._outer.bind('transformend', function(e) {
@@ -346,7 +343,6 @@ $(function() {
 			// Swipe
 			F._outer.bind('swipe', function(e) {				
 				if(!F._isDraggable) {
-					
 					if(e.gesture.direction === "left") {
 						F.next();
 					}
@@ -361,11 +357,7 @@ $(function() {
 		 * Show or hide loading animation
 		 * @param bool loading Set true if loading (show), false for not loading (hide)
 		 */
-		_showLoading: function(loading) {			
-			if(typeof loading === "undefined") {
-				loading = true;
-			}
-			
+		_showLoading: function(loading) {
 			F._isLoading = loading;
 			F._loading.removeClass(F._animClasses);
 			
@@ -379,7 +371,6 @@ $(function() {
 			} else {
 				if(F._isAnimated !== false) {
 					F._loading.removeClass(F._animClasses).addClass('animated fadeOut');
-					// Hide is triggered on callback
 				} else {
 					F._loading.hide();
 				}				
