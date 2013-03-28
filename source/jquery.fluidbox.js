@@ -277,13 +277,6 @@ $(function() {
 				hold: false
 			});
 			
-			// Disable page scrolling
-			$(document).bind('touchmove', function(e) {
-				if($(F._outer).find(e.target).length === 0) {
-					e.preventDefault();
-				}
-			});
-			
 			// Drag
 			F._outer.bind('dragstart', function(e) {
 				e.preventDefault();
@@ -296,8 +289,8 @@ $(function() {
 					e.preventDefault();
 					
 					F._outer.css({
-						'left': F._outer.data('currentX') + e.gesture.deltaX,
-						'top':  F._outer.data('currentY') + e.gesture.deltaY
+						'left': Math.round(F._outer.data('currentX') + e.gesture.deltaX),
+						'top':  Math.round(F._outer.data('currentY') + e.gesture.deltaY)
 					});
 				}
 			});
@@ -324,13 +317,13 @@ $(function() {
 			});
 			
 			F._outer.bind('transform', function(e) {		
-				var newWidth = F._outer.data('currentWidth') * e.gesture.scale,
-					newHeight = F._outer.data('currentHeight') * e.gesture.scale;
+				var newWidth = Math.round(F._outer.data('currentWidth') * e.gesture.scale),
+					newHeight = Math.round(F._outer.data('currentHeight') * e.gesture.scale);
 				
 				F._outer.css({
 					'width': newWidth,
-					'left': F._outer.data('currentX') + ((F._outer.data('currentWidth') - newWidth) / 2) + e.gesture.deltaX,
-					'top': F._outer.data('currentY') + ((F._outer.data('currentHeight') - newHeight) / 2) + e.gesture.deltaY
+					'left': Math.round(F._outer.data('currentX') + ((F._outer.data('currentWidth') - newWidth) / 2) + e.gesture.deltaX),
+					'top': Math.round(F._outer.data('currentY') + ((F._outer.data('currentHeight') - newHeight) / 2) + e.gesture.deltaY)
 				});
 			});
 			
@@ -652,18 +645,18 @@ $(function() {
 			
 			if((origWidth > vpWidth || origHeight > vpHeight) && !F._isDraggable) {
 				iRatio = Math.min(vpWidth / origWidth, vpHeight / origHeight);
-				newWidth = (origWidth * iRatio);
-				newHeight = (origHeight * iRatio);
+				newWidth = Math.round((origWidth * iRatio));
+				newHeight = Math.round((origHeight * iRatio));
 				F._outer.css({
 					'width': newWidth,
-					'left': (F._currentOptions.padding / 2) + ((vpWidth - newWidth) / 2),
-					'top': (F._currentOptions.padding / 2) + ((vpHeight - newHeight) / 2)
+					'left': Math.round((F._currentOptions.padding / 2) + ((vpWidth - newWidth) / 2)),
+					'top': Math.round((F._currentOptions.padding / 2) + ((vpHeight - newHeight) / 2))
 				});
 			} else {
 				F._outer.css({
 					'width': origWidth,
-					'left': (winWidth - origWidth) / 2,
-					'top': (winHeight - origHeight) / 2
+					'left': Math.round((winWidth - origWidth) / 2),
+					'top': Math.round((winHeight - origHeight) / 2)
 				});
 			}
 		}

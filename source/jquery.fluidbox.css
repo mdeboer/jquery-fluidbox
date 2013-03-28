@@ -99,7 +99,8 @@
 	cursor: pointer;
 }
 
-.touch #fluidbox-btn-next, .touch #fluidbox-btn-prev {
+#fluidbox-outer.touch #fluidbox-btn-next, 
+#fluidbox-outer.touch #fluidbox-btn-prev {
 	display: none;
 }
 
