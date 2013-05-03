@@ -73,6 +73,7 @@
 	padding: 5px 0px;
 	text-indent: 5px;
 	font-family: sans-serif;
+	z-index: 8006;
 	-ms-filter:”progid:DXImageTransform.Microsoft.Alpha(Opacity=0)”;
 	filter: alpha(opacity=0);
 	-moz-opacity: 0;
