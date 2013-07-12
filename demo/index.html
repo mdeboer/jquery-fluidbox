@@ -61,6 +61,30 @@
 				$($(this).children('a').first().attr('href')).parents('section').show();
 			});
 			
+			$('code[data-option]').popover({ 
+				title: 'Contents', 
+				trigger: 'hover',
+				html: true,
+				content: function() {
+					var content = JSON.stringify($.fluidbox.defaults[$(this).data('option')], null, '\t');
+					
+					content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+				
+					return '<pre>' + content + '</pre>';
+				}
+			});
+			
+			$('code[data-description]').popover({
+				title: function() {
+					return $(this).data('title') ? $(this).data('title') : $(this).text();
+				},
+				trigger: 'hover',
+				html: true,
+				content: function() {				
+					return $(this).data('description');
+				}
+			});
+			
 			/* Basic demo */
 			$('.demo-default').fluidbox();
 			
@@ -141,12 +165,8 @@
 						<li>Support for browsers without animation support!</li>
 						<li>Lot's of customization support</li>
 					</ul>
-					
-					<h3>Coming soon</h3>
-					<ul>
-						<li>Better support for (older) mobile phones and tablets</li>
-					</ul>
-					<p><em>Also, check the <a href="https://github.com/mdeboer/jquery-fluidbox/issues">issues tracker</a> for more coming features or post your own ideas!</em></p>
+
+					<p><em>See the <a href="https://github.com/mdeboer/jquery-fluidbox/issues">issues tracker</a> for more coming features or post your own ideas!</em></p>
 				</section>
 				
 				<!-- Options -->
@@ -167,31 +187,31 @@
 							<tr>
 								<td>animated</td>
 								<td><code>boolean</code></td>
-								<td><code class="option" data-option="animation">true</code></td>
+								<td><code>true</code></td>
 								<td>True to use animations if available, false to disable animations.</td>
 							</tr>
 							<tr>
 								<td>animations</td>
 								<td><code>false</code>, <code>PlainObject</code></td>
-								<td><code class="option" data-option="animation">PlainObject</code></td>
+								<td><code data-option="animations">PlainObject</code></td>
 								<td>Contains animation name for each action.</td>
 							</tr>
 							<tr>
 								<td>keys</td>
 								<td><code>PlainObject</code></td>
-								<td><code class="option" data-option="keys">PlainObject</code></td>
+								<td><code data-option="keys">PlainObject</code></td>
 								<td>Key codes for navigation actions</td>
 							</tr>
 							<tr>
 								<td>padding</td>
 								<td><code>integer</code></td>
-								<td><code class="option" data-option="animation">50</code></td>
+								<td><code>50</code></td>
 								<td>Padding between the window borders and the image in pixels.</td>
 							</tr>
 							<tr>
 								<td>positions</td>
 								<td><code>PlainObject</code></td>
-								<td><code class="option" data-option="positions">PlainObject</code></td>
+								<td><code data-option="positions">PlainObject</code></td>
 								<td>Contains the positions for various Fluidbox elements. Eg. <code>inner</code> relates to <code>#fluidbox-inner</code></td>
 							</tr>
 							<tr>
@@ -209,7 +229,7 @@
 							<tr>
 								<td>templates</td>
 								<td><code>PlainObject</code></td>
-								<td><code class="option" data-option="templates">PlainObject</code></td>
+								<td><code data-option="templates">PlainObject</code></td>
 								<td>Contains html templates of all Fluidbox elements.</td>
 							</tr>
 							<tr>
@@ -222,21 +242,6 @@
 					</table>
 					
 					<p class="muted">* For all available animations for use in the <code>animation</code> option, see <a href="http://daneden.me/animate/" target="_blank">http://daneden.me/animate/</a></p>
-					
-					<script type="text/javascript" language="javascript">
-						$('code.option').popover({ 
-							title: 'Contents', 
-							trigger: 'hover',
-							html: true,
-							content: function() {
-								var content = JSON.stringify($.fluidbox.defaults[$(this).data('option')], null, '\t');
-								
-								content = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-							
-								return '<pre>' + content + '</pre>';
-							}
-						});
-					</script>
 				</section>
 				
 				<!-- Events -->
@@ -248,56 +253,76 @@
 						<thead>
 							<tr>
 								<th>Name</th>
+								<th>Arguments</th>
 								<th>Description</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
 								<td><code>fluidboxBeforeCreate</code></td>
+								<td></td>
 								<td>Triggered before overlay and all other Fluidbox elements are created.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxAfterCreate</code></td>
+								<td></td>
 								<td>Triggered after overlay and all other Fluidbox elements are created.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxBeforeBind</code></td>
+								<td></td>
 								<td>Triggered before binding default keys and events.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxAfterBind</code></td>
+								<td></td>
 								<td>Triggered after binding default keys and events.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxBeforeOpen</code></td>
+								<td></td>
 								<td>Triggered before showing the overlay.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxAfterOpen</code></td>
+								<td></td>
 								<td>Triggered after elements are created, keys are bound and the overlay is shown.<br /><span class="muted">Note: opening animation might still not be completed when this event is raised</span></td>
 							</tr>
 							<tr>
 								<td><code>fluidboxBeforeShow</code></td>
-								<td>Triggered before the new (next) item is shown.</td>
+								<td>
+									<code data-description="Index (zero based) of the current item">index</code>
+									<code data-description="Index (zero based) of the current item">target</code>
+									<code data-description="Index (zero based) of the current item">direction</code>
+									<code data-description="Index (zero based) of the current item">image</code>
+									<code data-description="Index (zero based) of the current item">title</code>
+									<code data-description="Index (zero based) of the current item">animation</code>
+								</td>
+								<td>Triggered before the new item is shown.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxAfterShow</code></td>
+								<td></td>
 								<td>Triggered after the new (next) item is shown.<br /><span class="muted">Note: prev/next animation might still not be completed when this event is raised</span></td>
 							</tr>
 							<tr>
 								<td><code>fluidboxBeforeHide</code></td>
+								<td></td>
 								<td>Triggered before the previously shown item is about to be cast into oblivion.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxAfterHide</code></td>
+								<td></td>
 								<td>Triggered after the previously shown item is gone.<br /><span class="muted">Note: prev/next animation might still not be completed when this event is raised</span></td>
 							</tr>
 							<tr>
 								<td><code>fluidboxBeforeClose</code></td>
+								<td></td>
 								<td>Triggered when the overlay is about to close.</td>
 							</tr>
 							<tr>
 								<td><code>fluidboxAfterClose</code></td>
+								<td></td>
 								<td>Triggered when the overlay is closed.<br /><span class="muted">Note: closing animation might still not be completed when this event is raised</span></td>
 							</tr>
 						</tbody>
@@ -308,23 +333,23 @@
 				<section id="page-getting-started" style="display: none;">
 					<h2 id="getting-started" name="getting-started">Getting started</h2>
 					
-					<p>To get started: include <a href="http://jquery.com/" target="_blank">jQuery</a>, <a href="http://modernizr.com/" target="_blank">Modernizr</a>, <a href="http://eightmedia.github.com/hammer.js/" target="_blank">Hammer</a> (optional) and Fluidbox in the <code>head</code> of your page like this:</p>
+					<p>To get started: include <a href="http://jquery.com/" target="_blank">jQuery</a>, Fluidbox and optionally <a href="http://modernizr.com/" target="_blank">Modernizr</a> and/or <a href="http://eightmedia.github.com/hammer.js/" target="_blank">Hammer</a> in the <code>head</code> of your page like this:</p>
 					
 <pre class="prettyprint lang-html linenums">
 &lt;!DOCTYPE html&gt;
     &lt;html lang="en"&gt;
     &lt;head&gt;
         &lt;!-- Necessary --&gt;
-        &lt;script language="javascript" src="js/jquery-1.8.3.min.js"&gt;&lt;/script&gt;
-        &lt;script language="javascript" src="js/modernizr.custom.min.js"&gt;&lt;/script&gt;
-        &lt;link rel="stylesheet" href="css/animate.min.css"&gt;
+        &lt;script language="javascript" src="lib/js/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
         
         &lt;!-- Optional --&gt;
-        &lt;script language="javascript" src="js/hammer.min.js"&gt;&lt;/script&gt;
+		&lt;script language="javascript" src="lib/js/modernizr.custom.min.js"&gt;&lt;/script&gt;
+        &lt;script language="javascript" src="lib/js/hammer.min.js"&gt;&lt;/script&gt;
+        &lt;link rel="stylesheet" href="lib/css/animate.min.css"&gt;
         
         &lt;!-- Fluidbox --&gt;
-        &lt;script language="javascript" src="js/jquery.fluidbox.js"&gt;&lt;/script&gt;
-        &lt;link rel="stylesheet" href="css/jquery.fluidbox.css"&gt;
+        &lt;script language="javascript" src="source/jquery.fluidbox.js"&gt;&lt;/script&gt;
+        &lt;link rel="stylesheet" href="source/jquery.fluidbox.css"&gt;
     &lt;/head&gt;
     ...
 </pre>

@@ -488,10 +488,9 @@
 			
 			/** 
 			 * Show next image in collection (if available) 
-			 * @param string animDirection Animation direction (up | down | left | right)
 			 */
 			next: function() {
-				if(F._currentCollection.length <= 1 || F._isDraggable) {
+				if(F._currentCollection.length <= 1 || F._isDraggable || F._isLoading) {
 					return;
 				}
 					
@@ -500,10 +499,9 @@
 			
 			/** 
 			 * Show previous image in collection (if available) 
-			 * @param string animDirection Animation direction (up | down | left | right)
 			 */
 			prev: function() {
-				if(F._currentCollection.length <= 1 || F._isDraggable) {
+				if(F._currentCollection.length <= 1 || F._isDraggable || F._isLoading) {
 					return;
 				}
 				
@@ -515,7 +513,11 @@
 			 * @param int index Index of image to show from collection
 			 * @param string direction Optional direction parameter (next | prev | open)
 			 */
-			show: function(index, direction) {			
+			show: function(index, direction) {
+                if(F._isLoading) {
+                    return;
+                }
+                
 				if(index === 'undefined' || index < 0 || index > F._currentCollection.length) {
 					index = 0;
 				}
@@ -624,7 +626,7 @@
 				currentImage.src = $(currentElement).attr('href');
 				
 				// Show loading indicator
-				F._showLoading();
+				F._showLoading(true);
 			},
 			
 			/** Resize the overlay */
