@@ -414,15 +414,15 @@
 					console.log('CSS3 transition support not detected or not available, animations disabled.');
 				}
 				
-				// Add overlay
-				F._createOverlay();
-				
 				var fluidboxBeforeOpenEvent = $.Event('fluidboxBeforeOpen');
 				$(F._instance).triggerHandler(fluidboxBeforeOpenEvent);
 				
-				if(fluidboxBeforeOpen.isDefaultPrevented()) {
+				if(fluidboxBeforeOpenEvent.isDefaultPrevented()) {
 					return;
 				}
+				
+				// Add overlay
+				F._createOverlay();
 				
 				// Show overlay
 				if(F._isAnimated !== false) {
