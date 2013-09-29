@@ -417,7 +417,12 @@
 				// Add overlay
 				F._createOverlay();
 				
-				$(F._instance).triggerHandler("fluidboxBeforeOpen");
+				var fluidboxBeforeOpenEvent = $.Event('fluidboxBeforeOpen');
+				$(F._instance).triggerHandler(fluidboxBeforeOpenEvent);
+				
+				if(fluidboxBeforeOpen.isDefaultPrevented()) {
+					return;
+				}
 				
 				// Show overlay
 				if(F._isAnimated !== false) {
